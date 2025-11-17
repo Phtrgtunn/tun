@@ -33,6 +33,8 @@
             <!-- Video Trailer if available -->
             <iframe
               v-if="movieData?.trailer_url"
+              ref="youtubePlayer"
+              :key="getYoutubeEmbedUrl(movieData.trailer_url)"
               :src="getYoutubeEmbedUrl(movieData.trailer_url)"
               class="w-full h-full"
               frameborder="0"
@@ -386,33 +388,33 @@ const toggleShowMore = () => {
   showAllSimilar.value = !showAllSimilar.value;
 };
 
+const youtubePlayer = ref(null);
+const iframeReady = ref(false);
+
 const getYoutubeEmbedUrl = (url) => {
   if (!url) return '';
   const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
   const muteParam = isMuted.value ? '1' : '0';
-  return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&controls=0&showinfo=0&rel=0&enablejsapi=1` : url;
+  return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&controls=0&showinfo=0&rel=0&enablejsapi=1&origin=${window.location.origin}` : url;
 };
 
 const toggleMute = () => {
   isMuted.value = !isMuted.value;
   
-  // Use YouTube IFrame API to control mute
   const iframe = document.querySelector('iframe');
-  if (iframe && iframe.contentWindow) {
-    try {
-      // Send postMessage to YouTube iframe
-      const command = isMuted.value ? 'mute' : 'unMute';
-      iframe.contentWindow.postMessage(JSON.stringify({
-        event: 'command',
-        func: command,
-        args: []
-      }), '*');
-      console.log(`🔊 ${isMuted.value ? 'Muted' : 'Unmuted'} video`);
-    } catch (error) {
-      console.error('Error controlling video:', error);
-      // Fallback: reload iframe
-      iframe.src = getYoutubeEmbedUrl(movieData.value.trailer_url);
-    }
+  if (!iframe || !movieData.value?.trailer_url) return;
+  
+  try {
+    // Try using postMessage first (works if iframe is ready)
+    const command = isMuted.value ? 'mute' : 'unMute';
+    iframe.contentWindow.postMessage(JSON.stringify({
+      event: 'command',
+      func: command,
+      args: []
+    }), '*');
+    console.log(`🔊 ${isMuted.value ? 'Muted' : 'Unmuted'} video via postMessage`);
+  } catch (error) {
+    console.log('⚠️ postMessage failed, will update on next load');
   }
 };
 
