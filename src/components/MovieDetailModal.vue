@@ -389,8 +389,6 @@ const toggleShowMore = () => {
 };
 
 const youtubePlayer = ref(null);
-const iframeReady = ref(false);
-const initialMuteState = ref(true);
 
 const getYoutubeVideoId = (url) => {
   if (!url) return '';
@@ -400,11 +398,10 @@ const getYoutubeVideoId = (url) => {
 const getYoutubeEmbedUrl = (url) => {
   if (!url) return '';
   const videoId = getYoutubeVideoId(url);
-  // Use initialMuteState instead of isMuted to prevent URL changes on toggle
-  const muteParam = initialMuteState.value ? '1' : '0';
+  // Always start muted, we'll control it via postMessage
   // Parameters to hide YouTube branding and controls:
   // autoplay=1 - auto play video
-  // mute - mute/unmute based on initial state
+  // mute=1 - start muted (we control via API)
   // controls=0 - hide player controls
   // showinfo=0 - hide title (deprecated but still works sometimes)
   // modestbranding=1 - hide YouTube logo
@@ -413,26 +410,29 @@ const getYoutubeEmbedUrl = (url) => {
   // disablekb=1 - disable keyboard controls
   // fs=0 - hide fullscreen button
   // enablejsapi=1 - enable JavaScript API
-  return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&controls=0&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin=${window.location.origin}` : url;
+  return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin=${window.location.origin}` : url;
 };
 
 const toggleMute = () => {
   isMuted.value = !isMuted.value;
   
-  const iframe = document.querySelector('iframe');
+  const iframe = youtubePlayer.value;
   if (!iframe || !movieData.value?.trailer_url) return;
   
   try {
-    // Try using postMessage first (works if iframe is ready)
+    // Use YouTube IFrame API postMessage
     const command = isMuted.value ? 'mute' : 'unMute';
-    iframe.contentWindow.postMessage(JSON.stringify({
-      event: 'command',
-      func: command,
-      args: []
-    }), '*');
-    console.log(`🔊 ${isMuted.value ? 'Muted' : 'Unmuted'} video via postMessage`);
+    iframe.contentWindow.postMessage(
+      JSON.stringify({
+        event: 'command',
+        func: command,
+        args: []
+      }),
+      '*'
+    );
+    console.log(`🔊 ${isMuted.value ? 'Muted' : 'Unmuted'} video`);
   } catch (error) {
-    console.log('⚠️ postMessage failed, will update on next load');
+    console.error('⚠️ Error toggling mute:', error);
   }
 };
 
@@ -632,7 +632,6 @@ watch(() => props.isOpen, (newVal) => {
     showAllSimilar.value = false;
     showFullDescription.value = false;
     isMuted.value = true; // Reset mute state
-    initialMuteState.value = true; // Reset initial mute state
   }
 }, { immediate: true });
 </script>
