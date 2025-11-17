@@ -115,6 +115,11 @@ onMounted(() => {
 <style>
 body {
   padding-top: 0;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 /* Hide Scrollbar */
