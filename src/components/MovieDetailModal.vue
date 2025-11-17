@@ -10,9 +10,9 @@
           <!-- Close Button -->
           <button
             @click="closeModal"
-            class="absolute top-4 right-4 z-50 w-10 h-10 bg-[#181818] hover:bg-gray-700 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+            class="absolute top-4 right-4 z-50 w-10 h-10 bg-[#181818] hover:bg-yellow-400 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 group"
           >
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-white group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
@@ -72,18 +72,25 @@
                   </svg>
                   Phát
                 </button>
-                <button class="w-10 h-10 bg-[#2a2a2a] hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors border-2 border-gray-500">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button class="w-10 h-10 bg-[#2a2a2a] hover:bg-yellow-400 hover:border-yellow-400 rounded-full flex items-center justify-center transition-colors border-2 border-gray-500 group">
+                  <svg class="w-5 h-5 text-white group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                   </svg>
                 </button>
-                <button class="w-10 h-10 bg-[#2a2a2a] hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors border-2 border-gray-500">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button class="w-10 h-10 bg-[#2a2a2a] hover:bg-yellow-400 hover:border-yellow-400 rounded-full flex items-center justify-center transition-colors border-2 border-gray-500 group">
+                  <svg class="w-5 h-5 text-white group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                   </svg>
                 </button>
-                <button class="ml-auto w-10 h-10 bg-[#2a2a2a] hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors border-2 border-gray-500">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button 
+                  @click="toggleMute"
+                  class="ml-auto w-10 h-10 bg-[#2a2a2a] hover:bg-yellow-400 hover:border-yellow-400 rounded-full flex items-center justify-center transition-colors border-2 border-gray-500 group"
+                >
+                  <svg v-if="isMuted" class="w-5 h-5 text-white group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+                  </svg>
+                  <svg v-else class="w-5 h-5 text-white group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
                   </svg>
                 </button>
@@ -188,11 +195,12 @@
                   @click="openSimilarMovie(movie)"
                   class="bg-[#2a2a2a] rounded-lg overflow-hidden hover:bg-[#3a3a3a] transition-all duration-300 cursor-pointer group"
                 >
-                  <div class="relative aspect-video">
+                  <div class="relative aspect-video bg-gray-800">
                     <img
                       :src="getImageUrl(movie.thumb_url)"
                       :alt="movie.name"
-                      class="w-full h-full object-cover"
+                      class="w-full h-full object-cover object-center"
+                      style="object-position: center 20%;"
                       @error="handleImageError"
                     />
                     <!-- Episode Badge -->
@@ -232,9 +240,9 @@
                       <!-- Right: Add Button -->
                       <button 
                         @click.stop
-                        class="w-7 h-7 border-2 border-gray-500 hover:border-white rounded-full flex items-center justify-center transition-colors flex-shrink-0 ml-2"
+                        class="w-7 h-7 border-2 border-gray-500 hover:border-yellow-400 hover:bg-yellow-400 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ml-2 group"
                       >
-                        <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                       </button>
@@ -257,10 +265,10 @@
               <button
                 v-if="similarMovies.length > 6"
                 @click="toggleShowMore"
-                class="mt-6 mx-auto w-12 h-12 border-2 border-gray-500 hover:border-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                class="mt-6 mx-auto w-12 h-12 border-2 border-gray-500 hover:border-yellow-400 hover:bg-yellow-400 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 group"
               >
                 <svg
-                  class="w-6 h-6 text-gray-400 transition-transform duration-300"
+                  class="w-6 h-6 text-gray-400 group-hover:text-black transition-all duration-300"
                   :class="{ 'rotate-180': showAllSimilar }"
                   fill="none"
                   stroke="currentColor"
@@ -362,6 +370,7 @@ const comments = ref([]);
 const showAllSimilar = ref(false);
 const showFullDescription = ref(false);
 const loading = ref(false);
+const isMuted = ref(true);
 
 const API_URL = 'http://localhost/HTHREE_film/backend/api';
 
@@ -380,7 +389,31 @@ const toggleShowMore = () => {
 const getYoutubeEmbedUrl = (url) => {
   if (!url) return '';
   const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
-  return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0` : url;
+  const muteParam = isMuted.value ? '1' : '0';
+  return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&controls=0&showinfo=0&rel=0&enablejsapi=1` : url;
+};
+
+const toggleMute = () => {
+  isMuted.value = !isMuted.value;
+  
+  // Use YouTube IFrame API to control mute
+  const iframe = document.querySelector('iframe');
+  if (iframe && iframe.contentWindow) {
+    try {
+      // Send postMessage to YouTube iframe
+      const command = isMuted.value ? 'mute' : 'unMute';
+      iframe.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: command,
+        args: []
+      }), '*');
+      console.log(`🔊 ${isMuted.value ? 'Muted' : 'Unmuted'} video`);
+    } catch (error) {
+      console.error('Error controlling video:', error);
+      // Fallback: reload iframe
+      iframe.src = getYoutubeEmbedUrl(movieData.value.trailer_url);
+    }
+  }
 };
 
 const getCategoryNames = (categories) => {
@@ -578,6 +611,7 @@ watch(() => props.isOpen, (newVal) => {
     comments.value = [];
     showAllSimilar.value = false;
     showFullDescription.value = false;
+    isMuted.value = true; // Reset mute state
   }
 }, { immediate: true });
 </script>
