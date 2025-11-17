@@ -68,9 +68,9 @@
             <div class="absolute bottom-0 left-0 right-0 p-6">
               <h2 class="text-2xl font-bold text-white mb-3">{{ movieData?.name || 'Đang tải...' }}</h2>
               <div class="flex gap-2">
-                <button class="px-6 py-2 bg-white text-black font-bold rounded flex items-center gap-2 hover:bg-gray-200 transition-colors">
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/>
+                <button class="px-6 py-2 bg-white text-black font-bold rounded flex items-center gap-2 hover:bg-yellow-400 transition-colors">
+                  <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" stroke-linejoin="round" stroke-linecap="round"/>
                   </svg>
                   Phát
                 </button>
