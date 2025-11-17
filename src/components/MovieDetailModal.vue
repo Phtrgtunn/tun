@@ -3,10 +3,10 @@
     <Transition name="modal">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/95 pt-10 pb-10"
+        class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/95 pt-8 pb-8 px-4"
         @click.self="closeModal"
       >
-        <div class="relative w-full max-w-4xl bg-[#181818] rounded-lg shadow-2xl overflow-hidden">
+        <div class="relative w-full max-w-3xl bg-[#181818] rounded-lg shadow-2xl overflow-hidden">
           <!-- Close Button -->
           <button
             @click="closeModal"
@@ -30,6 +30,7 @@
 
           <!-- Video Trailer Background -->
           <div v-else class="relative w-full aspect-video bg-black">
+            <!-- Video Trailer if available -->
             <iframe
               v-if="movieData?.trailer_url"
               :src="getYoutubeEmbedUrl(movieData.trailer_url)"
@@ -38,9 +39,18 @@
               allow="autoplay; encrypted-media"
               allowfullscreen
             ></iframe>
+            <!-- Banner Image if no trailer -->
             <img
-              v-else-if="movieData?.poster_url || movieData?.thumb_url"
-              :src="getImageUrl(movieData?.poster_url || movieData?.thumb_url)"
+              v-else-if="movieData?.thumb_url"
+              :src="getImageUrl(movieData?.thumb_url)"
+              class="w-full h-full object-cover"
+              alt="Movie banner"
+              @error="handleImageError"
+            />
+            <!-- Fallback to poster -->
+            <img
+              v-else-if="movieData?.poster_url"
+              :src="getImageUrl(movieData?.poster_url)"
               class="w-full h-full object-cover"
               alt="Movie poster"
               @error="handleImageError"
@@ -53,9 +63,9 @@
             <div class="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent"></div>
             
             <!-- Movie Title & Actions -->
-            <div class="absolute bottom-0 left-0 right-0 p-8">
-              <h2 class="text-3xl font-bold text-white mb-4">{{ movieData?.name || 'Đang tải...' }}</h2>
-              <div class="flex gap-3">
+            <div class="absolute bottom-0 left-0 right-0 p-6">
+              <h2 class="text-2xl font-bold text-white mb-3">{{ movieData?.name || 'Đang tải...' }}</h2>
+              <div class="flex gap-2">
                 <button class="px-6 py-2 bg-white text-black font-bold rounded flex items-center gap-2 hover:bg-gray-200 transition-colors">
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/>
@@ -82,60 +92,99 @@
           </div>
 
           <!-- Content -->
-          <div class="p-8 bg-[#181818]">
-            <!-- Movie Info -->
-            <div class="mb-6">
-              <div class="flex items-center gap-3 text-sm mb-4">
-                <span class="text-green-400 font-semibold">{{ movieData?.year }}</span>
-                <span class="text-white">{{ movieData?.episode_current || 'Full' }}</span>
-                <span class="px-2 py-0.5 border border-gray-500 text-gray-300 text-xs">{{ movieData?.quality || 'HD' }}</span>
+          <div class="p-6 bg-[#181818]">
+            <!-- Movie Info - 2 Columns -->
+            <div class="grid grid-cols-3 gap-6 mb-5">
+              <!-- Left Column - Main Info -->
+              <div class="col-span-2">
+                <div class="flex items-center gap-3 text-sm mb-3">
+                  <span class="text-green-400 font-semibold">{{ movieData?.year }}</span>
+                  <span class="text-white">{{ movieData?.episode_current || 'Full' }}</span>
+                  <span class="px-2 py-0.5 border border-gray-500 text-gray-300 text-xs">{{ movieData?.quality || 'HD' }}</span>
+                </div>
+                
+                <div>
+                  <p 
+                    class="text-white text-sm leading-relaxed"
+                    :class="{ 'line-clamp-3': !showFullDescription }"
+                  >
+                    {{ movieData?.content || movieData?.description }}
+                  </p>
+                  <button
+                    v-if="(movieData?.content || movieData?.description)?.length > 200"
+                    @click="showFullDescription = !showFullDescription"
+                    class="text-gray-400 hover:text-white text-xs mt-2 flex items-center gap-1 transition-colors"
+                  >
+                    <span>{{ showFullDescription ? 'Thu gọn' : 'Xem thêm' }}</span>
+                    <svg 
+                      class="w-4 h-4 transition-transform duration-300"
+                      :class="{ 'rotate-180': showFullDescription }"
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              
-              <div class="flex gap-2 mb-4">
-                <span class="px-3 py-1 bg-gray-700 text-white text-xs rounded">Full</span>
-                <span class="px-3 py-1 bg-gray-700 text-white text-xs rounded">HD</span>
-                <span class="px-3 py-1 bg-gray-700 text-white text-xs rounded">Vietsub</span>
+
+              <!-- Right Column - Details -->
+              <div class="space-y-2 text-xs">
+                <div v-if="movieData?.actor && movieData.actor.length">
+                  <span class="text-gray-400">Diễn viên: </span>
+                  <span class="text-white">{{ movieData.actor.slice(0, 3).join(', ') }}</span>
+                </div>
+                <div v-if="movieData?.category">
+                  <span class="text-gray-400">Thể loại: </span>
+                  <span class="text-white">{{ getCategoryNames(movieData.category) }}</span>
+                </div>
+                <div v-if="movieData?.country">
+                  <span class="text-gray-400">Quốc gia: </span>
+                  <span class="text-white">{{ getCountryNames(movieData.country) }}</span>
+                </div>
+                <div v-if="movieData?.director && movieData.director.length">
+                  <span class="text-gray-400">Đạo diễn: </span>
+                  <span class="text-white">{{ movieData.director.join(', ') }}</span>
+                </div>
               </div>
-              
-              <p class="text-white text-sm leading-relaxed mb-4">
-                {{ movieData?.content || movieData?.description }}
-              </p>
             </div>
 
             <!-- Episodes Section -->
-            <div v-if="episodes && episodes.length > 0" class="mb-8 border-t border-gray-700 pt-6">
+            <div v-if="episodes && episodes.length > 0" class="mb-6 border-t border-gray-700 pt-5">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold text-white">Tập</h3>
                 <span class="text-gray-400 text-sm">{{ movieData?.name }}</span>
               </div>
-              <div class="space-y-2 max-h-96 overflow-y-auto">
+              <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-hide">
                 <div
                   v-for="(episode, index) in episodes"
                   :key="index"
-                  class="flex items-center gap-4 p-3 bg-[#2a2a2a] hover:bg-[#3a3a3a] rounded cursor-pointer transition-colors group"
+                  class="flex items-start gap-4 p-4 bg-[#2a2a2a] hover:bg-[#3a3a3a] rounded cursor-pointer transition-colors group"
                 >
-                  <span class="text-2xl font-bold text-gray-400 w-8">{{ index + 1 }}</span>
+                  <span class="text-3xl font-bold text-gray-500 w-10 flex-shrink-0">{{ index + 1 }}</span>
                   <img
-                    :src="movieData?.thumb_url || movieData?.poster_url"
-                    class="w-32 h-18 object-cover rounded"
+                    :src="getImageUrl(movieData?.thumb_url || movieData?.poster_url)"
+                    class="w-36 h-20 object-cover rounded flex-shrink-0"
                     :alt="`Episode ${index + 1}`"
+                    @error="handleImageError"
                   />
-                  <div class="flex-1">
-                    <h4 class="text-white font-semibold mb-1">{{ episode.name || `Tập ${index + 1}` }}</h4>
-                    <p class="text-gray-400 text-sm line-clamp-2">{{ movieData?.content?.substring(0, 100) || 'Nội dung đang cập nhật...' }}</p>
+                  <div class="flex-1 min-w-0">
+                    <h4 class="text-white font-bold mb-2 text-base">{{ episode.name || `Tập ${index + 1}` }}</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed line-clamp-2">{{ movieData?.content?.substring(0, 150) || 'Nội dung đang cập nhật...' }}</p>
                   </div>
-                  <span class="text-gray-400 text-sm">{{ movieData?.time || '23ph' }}</span>
+                  <span class="text-gray-400 text-sm flex-shrink-0">{{ movieData?.time || '76ph' }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Similar Content -->
-            <div class="mb-8 border-t border-gray-700 pt-6">
-              <h3 class="text-xl font-bold text-white mb-4">Nội dung tương tự</h3>
+            <div v-if="similarMovies.length > 0" class="mb-6 border-t border-gray-700 pt-5">
+              <h3 class="text-lg font-bold text-white mb-3">Nội dung tương tự</h3>
               <div class="grid grid-cols-3 gap-3">
                 <div
                   v-for="(movie, index) in displayedSimilarMovies"
-                  :key="movie._id || index"
+                  :key="movie._id || movie.slug || index"
                   class="bg-[#2a2a2a] rounded overflow-hidden hover:bg-[#3a3a3a] transition-colors cursor-pointer group"
                 >
                   <div class="relative aspect-video">
@@ -146,11 +195,11 @@
                       @error="handleImageError"
                     />
                     <div class="absolute top-2 left-2 flex gap-1">
-                      <span class="px-2 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded">{{ movie.episode_current || '7 tập' }}</span>
+                      <span v-if="movie.episode_current" class="px-2 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded">{{ movie.episode_current }}</span>
                     </div>
                     <div class="absolute top-2 right-2 flex gap-1">
-                      <span class="px-2 py-0.5 bg-black/80 text-white text-[10px] rounded">{{ movie.quality || 'HD' }}</span>
-                      <span class="px-2 py-0.5 bg-black/80 text-white text-[10px] rounded">{{ movie.year || '2025' }}</span>
+                      <span v-if="movie.quality" class="px-2 py-0.5 bg-black/80 text-white text-[10px] rounded">{{ movie.quality }}</span>
+                      <span v-if="movie.year" class="px-2 py-0.5 bg-black/80 text-white text-[10px] rounded">{{ movie.year }}</span>
                     </div>
                     <button class="absolute bottom-2 right-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,9 +207,9 @@
                       </svg>
                     </button>
                   </div>
-                  <div class="p-3">
-                    <p class="text-gray-400 text-xs mb-1">{{ movie.year || '2025' }}</p>
-                    <p class="text-white text-xs line-clamp-2 leading-relaxed">{{ movie.content?.substring(0, 80) || movie.name }}</p>
+                  <div class="p-2.5">
+                    <p class="text-gray-400 text-xs mb-1">{{ movie.year || '' }}</p>
+                    <p class="text-white text-xs line-clamp-2 leading-relaxed">{{ movie.content?.substring(0, 60) || movie.name }}</p>
                   </div>
                 </div>
               </div>
@@ -185,8 +234,8 @@
             </div>
 
             <!-- About Section -->
-            <div class="border-t border-gray-700 pt-6">
-              <h3 class="text-xl font-bold text-white mb-4">Giới thiệu về {{ movieData?.name }}</h3>
+            <div class="border-t border-gray-700 pt-5">
+              <h3 class="text-lg font-bold text-white mb-3">Giới thiệu về {{ movieData?.name }}</h3>
               <div class="space-y-2 text-sm">
                 <div v-if="movieData?.actor && movieData.actor.length">
                   <span class="text-gray-400">Diễn viên: </span>
@@ -232,6 +281,7 @@ const movieData = ref(null);
 const episodes = ref([]);
 const similarMovies = ref([]);
 const showAllSimilar = ref(false);
+const showFullDescription = ref(false);
 const loading = ref(false);
 
 const displayedSimilarMovies = computed(() => {
@@ -358,6 +408,7 @@ watch(() => props.isOpen, (newVal) => {
     episodes.value = [];
     similarMovies.value = [];
     showAllSimilar.value = false;
+    showFullDescription.value = false;
   }
 }, { immediate: true });
 </script>
@@ -381,5 +432,15 @@ watch(() => props.isOpen, (newVal) => {
 .modal-enter-from .relative,
 .modal-leave-to .relative {
   transform: scale(0.9);
+}
+
+/* Hide scrollbar */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>
