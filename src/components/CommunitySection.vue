@@ -1,6 +1,11 @@
 <template>
   <div class="community-section bg-black py-12 px-4 md:px-12">
     <div class="max-w-[1920px] mx-auto">
+      <!-- Comment Form -->
+      <div class="mb-10">
+        <CommentForm @comment-added="loadCommunityData" />
+      </div>
+      
       <!-- Top Bình Luận - Horizontal Carousel -->
       <div class="mb-8">
         <div class="flex items-center gap-2 mb-4">
@@ -148,28 +153,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import CommentForm from './CommentForm.vue';
 
+const API_URL = 'http://localhost/HTHREE_film/backend/api';
 const topScrollRef = ref(null);
 
 const topComments = ref([
-  { id: 1, name: 'N VL', avatar: 'https://ui-avatars.com/api/?name=NVL&background=f59e0b&color=000', text: 'Tập một bức mình nam chính thật sự, trả lời câu hỏi mà cứ ngơ ngơ...', movieTitle: 'Hiệp Sĩ Mặt Na', moviePoster: 'https://img.phimapi.com/upload/vod/20250707-1/0bd08744cae0baf83bb99ba9eb07decc.jpg', likes: 1, dislikes: 0, replies: 4 },
-  { id: 2, name: 'Khuong Nguyen', avatar: 'https://ui-avatars.com/api/?name=Khuong&background=3b82f6&color=fff', text: 'Cái bé này thật sự là hay quá, mình đã xem 3 lần rồi mà vẫn thấy hay!', movieTitle: 'Robin Hood', moviePoster: 'https://img.phimapi.com/upload/vod/20250707-1/8844c6722ca85a76e726dad012fc567e.jpg', likes: 5, dislikes: 0, replies: 2 },
-  { id: 3, name: 'Doss Nguyen', avatar: 'https://ui-avatars.com/api/?name=Doss&background=ef4444&color=fff', text: 'Phim hay lắm, diễn xuất tuyệt vời, cảnh quay đẹp mắt!', movieTitle: 'Sơn Thần', moviePoster: 'https://img.phimapi.com/upload/vod/20251116-1/WUwRjj2D.jpg', likes: 8, dislikes: 1, replies: 6 },
-  { id: 4, name: 'toni_nguyen', avatar: 'https://ui-avatars.com/api/?name=Toni&background=10b981&color=fff', text: 'Anime đỉnh cao! Miku chan kawaii quá đi mất!', movieTitle: 'Colorful Stage', moviePoster: 'https://img.phimapi.com/upload/vod/20250707-1/0bd08744cae0baf83bb99ba9eb07decc.jpg', likes: 12, dislikes: 0, replies: 8 }
+  { id: 1, name: 'N VL', avatar: 'https://ui-avatars.com/api/?name=NVL&background=f59e0b&color=000', text: 'Tập một bức mình nam chính thật sự, trả lời câu hỏi mà cứ ngơ ngơ...', movieTitle: 'Loading...', moviePoster: 'https://placehold.co/64x96/1a1a1a/fff?text=Loading', likes: 1, dislikes: 0, replies: 4 },
+  { id: 2, name: 'Khuong Nguyen', avatar: 'https://ui-avatars.com/api/?name=Khuong&background=3b82f6&color=fff', text: 'Cái bé này thật sự là hay quá, mình đã xem 3 lần rồi mà vẫn thấy hay!', movieTitle: 'Loading...', moviePoster: 'https://placehold.co/64x96/1a1a1a/fff?text=Loading', likes: 5, dislikes: 0, replies: 2 },
+  { id: 3, name: 'Doss Nguyen', avatar: 'https://ui-avatars.com/api/?name=Doss&background=ef4444&color=fff', text: 'Phim hay lắm, diễn xuất tuyệt vời, cảnh quay đẹp mắt!', movieTitle: 'Loading...', moviePoster: 'https://placehold.co/64x96/1a1a1a/fff?text=Loading', likes: 8, dislikes: 1, replies: 6 },
+  { id: 4, name: 'toni_nguyen', avatar: 'https://ui-avatars.com/api/?name=Toni&background=10b981&color=fff', text: 'Anime đỉnh cao! Miku chan kawaii quá đi mất!', movieTitle: 'Loading...', moviePoster: 'https://placehold.co/64x96/1a1a1a/fff?text=Loading', likes: 12, dislikes: 0, replies: 8 }
 ]);
 
-const trendingMovies = ref([
-  { title: 'Cá Đen Báo Tử', year: 2025, poster: 'https://img.phimapi.com/upload/vod/20250707-1/0bd08744cae0baf83bb99ba9eb07decc.jpg' },
-  { title: 'X Thần Mới', year: 2025, poster: 'https://img.phimapi.com/upload/vod/20250707-1/8844c6722ca85a76e726dad012fc567e.jpg' },
-  { title: 'Bộ Chót Thao Tung', year: 2024, poster: 'https://img.phimapi.com/upload/vod/20251116-1/WUwRjj2D.jpg' }
-]);
-
-const favoriteMovies = ref([
-  { title: 'X Thần Mới', year: 2025, poster: 'https://img.phimapi.com/upload/vod/20250707-1/8844c6722ca85a76e726dad012fc567e.jpg' },
-  { title: 'Tần Chột Thao Tung', year: 2024, poster: 'https://img.phimapi.com/upload/vod/20251116-1/WUwRjj2D.jpg' },
-  { title: 'Năm Ngón Tay Đầy Ký', year: 2024, poster: 'https://img.phimapi.com/upload/vod/20250707-1/0bd08744cae0baf83bb99ba9eb07decc.jpg' }
-]);
+const trendingMovies = ref([]);
+const favoriteMovies = ref([]);
 
 const recentComments = ref([
   { id: 1, name: 'Hoang Gang', avatar: 'https://ui-avatars.com/api/?name=Hoang&background=f59e0b&color=000', time: 'vừa xong', text: 'luôn là bộ phim tuyệt vời nhất mà tôi từng xem' },
@@ -179,6 +178,67 @@ const recentComments = ref([
 
 const scrollTopLeft = () => topScrollRef.value?.scrollBy({ left: -280, behavior: 'smooth' });
 const scrollTopRight = () => topScrollRef.value?.scrollBy({ left: 280, behavior: 'smooth' });
+
+const fetchMoviesFromAPI = async () => {
+  try {
+    // Fetch phim mới từ API
+    const response = await axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat', {
+      params: { page: 1 }
+    });
+    
+    if (response.data?.items?.length) {
+      const movies = response.data.items.slice(0, 10);
+      
+      // Lấy 3 phim đầu cho Trending
+      trendingMovies.value = movies.slice(0, 3).map(movie => ({
+        title: movie.name,
+        year: movie.year || 2024,
+        poster: `https://img.phimapi.com/${movie.poster_url}` // Poster dọc
+      }));
+      
+      // Lấy 3 phim tiếp theo cho Favorites
+      favoriteMovies.value = movies.slice(3, 6).map(movie => ({
+        title: movie.name,
+        year: movie.year || 2024,
+        poster: `https://img.phimapi.com/${movie.poster_url}` // Poster dọc
+      }));
+      
+      console.log('🎬 Loaded movies with vertical posters');
+    }
+  } catch (error) {
+    console.log('⚠️ Could not load movies:', error.message);
+  }
+};
+
+const loadCommunityData = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/community.php`);
+    console.log('📊 Community data:', response.data);
+    
+    if (response.data.success) {
+      const data = response.data.data;
+      
+      // Update recent comments
+      if (data.recent_comments?.length) {
+        recentComments.value = data.recent_comments.map(c => ({
+          id: c.id,
+          name: c.full_name || c.username,
+          avatar: c.avatar,
+          time: c.time_ago,
+          text: c.content
+        }));
+        console.log('✅ Updated recent comments:', recentComments.value.length);
+      }
+    }
+  } catch (error) {
+    console.log('⚠️ Could not load community data:', error.message);
+  }
+};
+
+onMounted(() => {
+  loadCommunityData();
+  fetchMoviesFromAPI();
+});
 </script>
 
 <style scoped>

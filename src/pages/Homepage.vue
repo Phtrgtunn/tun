@@ -198,7 +198,6 @@ import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import MovieRow from '@/components/MovieRow.vue';
 import CommunitySection from '@/components/CommunitySection.vue';
-import CommunitySection from '@/components/CommunitySection.vue';
 
 const router = useRouter();
 
