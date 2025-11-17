@@ -245,8 +245,8 @@ button {
 }
 </style>
 
-<sty
-le scoped>
+
+<style scoped>
 /* Hide scrollbar for the inner container */
 .overflow-y-auto::-webkit-scrollbar {
   display: none;
