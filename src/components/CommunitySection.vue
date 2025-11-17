@@ -246,13 +246,14 @@ const scrollTopRight = () => topScrollRef.value?.scrollBy({ left: 280, behavior:
 
 const fetchMoviesFromAPI = async () => {
   try {
-    // Fetch nhiều phim hơn từ 2 pages
-    const [page1, page2] = await Promise.all([
+    // Fetch nhiều phim hơn từ 3 pages để có đủ cho tất cả sections
+    const [page1, page2, page3] = await Promise.all([
       axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat', { params: { page: 1 } }),
-      axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat', { params: { page: 2 } })
+      axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat', { params: { page: 2 } }),
+      axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat', { params: { page: 3 } })
     ]);
     
-    const allMovies = [...(page1.data?.items || []), ...(page2.data?.items || [])];
+    const allMovies = [...(page1.data?.items || []), ...(page2.data?.items || []), ...(page3.data?.items || [])];
     console.log('🎬 API Response - Total movies:', allMovies.length);
     
     if (allMovies.length > 0) {
