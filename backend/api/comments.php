@@ -79,7 +79,8 @@ if ($method === 'GET') {
         
         echo json_encode([
             'success' => true,
-            'data' => $comments
+            'comments' => $comments,
+            'total' => count($comments)
         ]);
         
     } catch (Exception $e) {

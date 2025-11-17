@@ -234,7 +234,7 @@
             </div>
 
             <!-- About Section -->
-            <div class="border-t border-gray-700 pt-5">
+            <div class="border-t border-gray-700 pt-5 mb-6">
               <h3 class="text-lg font-bold text-white mb-3">Giới thiệu về {{ movieData?.name }}</h3>
               <div class="space-y-2 text-sm">
                 <div v-if="movieData?.actor && movieData.actor.length">
@@ -260,6 +260,44 @@
                 </div>
               </div>
             </div>
+
+            <!-- Comments Section -->
+            <div class="border-t border-gray-700 pt-5">
+              <h3 class="text-lg font-bold text-white mb-4">Bình luận</h3>
+              
+              <!-- Comment Form -->
+              <CommentForm 
+                :movie-slug="props.movieSlug"
+                @comment-added="fetchComments"
+              />
+
+              <!-- Comments List -->
+              <div v-if="comments.length > 0" class="mt-6 space-y-4">
+                <div
+                  v-for="comment in comments"
+                  :key="comment.id"
+                  class="flex gap-3 p-4 bg-[#2a2a2a] rounded-lg"
+                >
+                  <img
+                    :src="comment.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.full_name || 'User')}&background=f59e0b&color=000`"
+                    :alt="comment.full_name"
+                    class="w-10 h-10 rounded-full flex-shrink-0"
+                  />
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="text-white font-semibold text-sm">{{ comment.full_name }}</span>
+                      <span class="text-gray-500 text-xs">{{ formatDate(comment.created_at) }}</span>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">{{ comment.content }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- No comments -->
+              <div v-else class="mt-6 text-center py-8 bg-[#2a2a2a] rounded-lg">
+                <p class="text-gray-400 text-sm">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -269,6 +307,8 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import CommentForm from './CommentForm.vue';
+import axios from 'axios';
 
 const props = defineProps({
   isOpen: Boolean,
@@ -280,9 +320,12 @@ const emit = defineEmits(['close']);
 const movieData = ref(null);
 const episodes = ref([]);
 const similarMovies = ref([]);
+const comments = ref([]);
 const showAllSimilar = ref(false);
 const showFullDescription = ref(false);
 const loading = ref(false);
+
+const API_URL = 'http://localhost/HTHREE_film/backend/api';
 
 const displayedSimilarMovies = computed(() => {
   return showAllSimilar.value ? similarMovies.value : similarMovies.value.slice(0, 6);
@@ -360,8 +403,11 @@ const fetchMovieDetails = async () => {
       console.error('❌ Available keys:', Object.keys(data));
     }
     
-    // Fetch similar movies
-    await fetchSimilarMovies();
+    // Fetch similar movies and comments
+    await Promise.all([
+      fetchSimilarMovies(),
+      fetchComments()
+    ]);
   } catch (error) {
     console.error('❌ Error fetching movie details:', error);
   } finally {
@@ -392,6 +438,40 @@ const fetchSimilarMovies = async () => {
   }
 };
 
+const fetchComments = async () => {
+  if (!props.movieSlug) return;
+  
+  try {
+    const response = await axios.get(`${API_URL}/comments.php`, {
+      params: {
+        type: 'movie',
+        movie_slug: props.movieSlug,
+        limit: 50
+      }
+    });
+    if (response.data.success) {
+      comments.value = response.data.comments || [];
+      console.log('✅ Comments loaded:', comments.value.length);
+    }
+  } catch (error) {
+    console.error('❌ Error fetching comments:', error);
+    comments.value = [];
+  }
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000); // seconds
+  
+  if (diff < 60) return 'Vừa xong';
+  if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)} ngày trước`;
+  
+  return date.toLocaleDateString('vi-VN');
+};
+
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
     console.log('🎬 Modal opened with slug:', props.movieSlug);
@@ -407,6 +487,7 @@ watch(() => props.isOpen, (newVal) => {
     movieData.value = null;
     episodes.value = [];
     similarMovies.value = [];
+    comments.value = [];
     showAllSimilar.value = false;
     showFullDescription.value = false;
   }
