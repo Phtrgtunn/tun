@@ -38,7 +38,7 @@
       <button
         @click="submitComment"
         :disabled="!user || !commentText.trim() || isSubmitting"
-        class="px-6 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-500 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 disabled:hover:scale-100 flex items-center gap-2"
+        class="px-6 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-500 disabled:!bg-gray-600 disabled:!text-gray-400 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 disabled:hover:scale-100 flex items-center gap-2"
       >
         <svg v-if="isSubmitting" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
