@@ -190,7 +190,7 @@
                 >
                   <div class="relative aspect-video">
                     <img
-                      :src="getImageUrl(movie.thumb_url || movie.poster_url)"
+                      :src="getImageUrl(movie.thumb_url)"
                       :alt="movie.name"
                       class="w-full h-full object-cover"
                       @error="handleImageError"
