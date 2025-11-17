@@ -22,10 +22,11 @@
     <textarea
       v-model="commentText"
       :disabled="!user"
-      :placeholder="user ? 'Chia sẻ suy nghĩ của bạn về bộ phim này...' : 'Vui lòng đăng nhập để bình luận'"
+      :placeholder="user ? 'Chia sẻ suy nghĩ của bạn... (Enter để gửi, Shift+Enter để xuống dòng)' : 'Vui lòng đăng nhập để bình luận'"
       class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition resize-none"
       rows="4"
       maxlength="500"
+      @keydown.enter="handleEnterKey"
     ></textarea>
     
     <!-- Character count -->
@@ -91,37 +92,43 @@ const showSuccess = ref(false);
 
 const API_URL = 'http://localhost/HTHREE_film/backend/api';
 
+const handleEnterKey = (event) => {
+  // Nếu chỉ nhấn Enter (không có Shift) thì gửi comment
+  if (!event.shiftKey) {
+    event.preventDefault(); // Ngăn xuống dòng
+    submitComment();
+  }
+  // Nếu Shift+Enter thì để mặc định (xuống dòng)
+};
+
 const submitComment = async () => {
   if (!user.value || !commentText.value.trim()) return;
   
   isSubmitting.value = true;
   
   try {
-    // Get or create user in database
-    const userResponse = await axios.post(`${API_URL}/auth/login.php`, {
+    console.log('🚀 Submitting comment...', {
       email: user.value.email,
-      username: user.value.displayName || user.value.email.split('@')[0],
-      full_name: user.value.displayName,
-      avatar: user.value.photoURL
+      displayName: user.value.displayName,
+      uid: user.value.uid
     });
     
-    let userId = userResponse.data.user?.id;
+    // Register/Get user from database
+    const userResponse = await axios.post(`${API_URL}/users.php`, {
+      firebase_uid: user.value.uid,
+      email: user.value.email,
+      username: user.value.email.split('@')[0],
+      full_name: user.value.displayName || user.value.email.split('@')[0],
+      avatar: user.value.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.displayName || user.value.email.split('@')[0])}&background=f59e0b&color=000`
+    });
     
-    // If user doesn't exist, create one
-    if (!userId) {
-      const registerResponse = await axios.post(`${API_URL}/auth/register.php`, {
-        email: user.value.email,
-        username: user.value.displayName || user.value.email.split('@')[0],
-        password: 'firebase_auth_' + user.value.uid, // Dummy password for Firebase users
-        full_name: user.value.displayName,
-        avatar: user.value.photoURL
-      });
-      userId = registerResponse.data.user?.id;
+    console.log('👤 User response:', userResponse.data);
+    
+    if (!userResponse.data.success) {
+      throw new Error('Failed to register/get user');
     }
     
-    if (!userId) {
-      throw new Error('Could not get user ID');
-    }
+    const userId = userResponse.data.user.id;
     
     // Submit comment
     const response = await axios.post(`${API_URL}/comments.php`, {
