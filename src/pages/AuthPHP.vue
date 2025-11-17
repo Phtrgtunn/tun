@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 z-50 flex items-center justify-center overflow-auto">
+  <div class="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 z-50 flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
     
     <!-- Animated background -->
@@ -8,7 +8,7 @@
       <div class="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl -bottom-48 -right-48 animate-pulse delay-1000"></div>
     </div>
 
-    <div class="relative z-10 w-full max-w-md p-6">
+    <div class="relative z-10 w-full max-w-md p-6 max-h-screen overflow-y-auto">
       <div class="bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-gray-700/50">
         <!-- Close button -->
         <button 

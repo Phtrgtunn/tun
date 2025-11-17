@@ -1,7 +1,7 @@
 <template>
-<div class="fixed inset-0 bg-[url('https://wallpapers.com/images/hd/netflix-background-gs7hjuwvv2g0e9fj.jpg')] bg-cover bg-center z-50 flex items-center justify-center overflow-auto">
+<div class="fixed inset-0 bg-[url('https://wallpapers.com/images/hd/netflix-background-gs7hjuwvv2g0e9fj.jpg')] bg-cover bg-center z-50 flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm z-0"></div>
-    <div class="relative z-10 w-full max-w-md p-6">
+    <div class="relative z-10 w-full max-w-md p-6 max-h-screen overflow-y-auto">
       <div class="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/10 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]">
         <button @click="router.push('/')" class="absolute top-4 right-4 text-white text-2xl hover:text-blue-300 transition-transform duration-200 hover:scale-110">×</button>
         <h2 class="text-4xl font-extrabold text-center text-white mb-8 tracking-tight">{{ isLogin ? 'Đăng Nhập' : 'Đăng Ký' }}</h2>
