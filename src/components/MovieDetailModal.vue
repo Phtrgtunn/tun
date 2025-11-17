@@ -209,27 +209,30 @@
                     </div>
                   </div>
                   <div class="p-4">
-                    <!-- Badges Row -->
-                    <div class="flex items-center gap-2 mb-3 flex-wrap">
-                      <!-- Quality Badge -->
-                      <span v-if="movie.quality" class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] font-bold rounded">{{ movie.quality }}</span>
-                      <span v-else class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] font-bold rounded">HD</span>
+                    <!-- Top Row: Badges and Add Button -->
+                    <div class="flex items-start justify-between mb-3">
+                      <!-- Left: Badges -->
+                      <div class="flex items-center gap-2 flex-wrap flex-1">
+                        <!-- Quality Badge -->
+                        <span v-if="movie.quality" class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] font-bold rounded">{{ movie.quality }}</span>
+                        <span v-else class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] font-bold rounded">HD</span>
+                        
+                        <!-- Language Badge -->
+                        <span v-if="movie.lang" class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded">{{ movie.lang }}</span>
+                        <span v-else class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded">Vietsub</span>
+                        
+                        <!-- Year -->
+                        <span v-if="movie.year" class="px-2 py-0.5 bg-gray-700 text-white text-[10px] font-semibold rounded">{{ movie.year }}</span>
+                        
+                        <!-- Type Badge -->
+                        <span v-if="movie.type === 'series'" class="px-2 py-0.5 bg-purple-600 text-white text-[10px] font-bold rounded">Phim bộ</span>
+                        <span v-else-if="movie.type === 'single'" class="px-2 py-0.5 bg-green-600 text-white text-[10px] font-bold rounded">Phim lẻ</span>
+                      </div>
                       
-                      <!-- Language Badge -->
-                      <span v-if="movie.lang" class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded">{{ movie.lang }}</span>
-                      <span v-else class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded">Vietsub</span>
-                      
-                      <!-- Year -->
-                      <span v-if="movie.year" class="px-2 py-0.5 bg-gray-700 text-white text-[10px] font-semibold rounded">{{ movie.year }}</span>
-                      
-                      <!-- Type Badge -->
-                      <span v-if="movie.type === 'series'" class="px-2 py-0.5 bg-purple-600 text-white text-[10px] font-bold rounded">Phim bộ</span>
-                      <span v-else-if="movie.type === 'single'" class="px-2 py-0.5 bg-green-600 text-white text-[10px] font-bold rounded">Phim lẻ</span>
-                      
-                      <!-- Add Button -->
+                      <!-- Right: Add Button -->
                       <button 
                         @click.stop
-                        class="ml-auto w-7 h-7 border-2 border-gray-500 hover:border-white rounded-full flex items-center justify-center transition-colors"
+                        class="w-7 h-7 border-2 border-gray-500 hover:border-white rounded-full flex items-center justify-center transition-colors flex-shrink-0 ml-2"
                       >
                         <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -238,9 +241,21 @@
                     </div>
                     
                     <!-- Description with ellipsis -->
-                    <p class="text-gray-300 text-sm leading-relaxed line-clamp-4 mb-1">
+                    <p class="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-2">
                       {{ movie.content || movie.description || movie.origin_name || 'Một bộ phim hấp dẫn đang chờ bạn khám phá. Hãy xem ngay để biết thêm chi tiết về cốt truyện và dàn diễn viên.' }}
                     </p>
+                    
+                    <!-- Bottom Info: Genres and Country -->
+                    <div class="flex items-center justify-between text-[10px] text-gray-500">
+                      <!-- Genres -->
+                      <div v-if="movie.category && movie.category.length" class="flex items-center gap-1">
+                        <span>{{ movie.category.slice(0, 2).map(c => c.name).join(' • ') }}</span>
+                      </div>
+                      <!-- Country -->
+                      <div v-if="movie.country && movie.country.length" class="flex items-center gap-1">
+                        <span>{{ movie.country[0].name }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -452,27 +467,49 @@ const fetchSimilarMovies = async () => {
     const data = await response.json();
     
     console.log('🎞️ Similar movies response:', data);
-    console.log('🎞️ Response status:', data.status);
-    console.log('🎞️ Response items:', data.items?.length);
-    console.log('🎞️ Response data.items:', data.data?.items?.length);
     
     // Check multiple possible response structures
+    let movies = [];
     if ((data.status === 'success' || data.status === true) && data.items) {
-      // Get 12 random movies
       const shuffled = data.items.sort(() => 0.5 - Math.random());
-      similarMovies.value = shuffled.slice(0, 12);
-      console.log('✅ Similar movies loaded:', similarMovies.value.length);
-      console.log('✅ First movie:', similarMovies.value[0]);
+      movies = shuffled.slice(0, 12);
     } else if (data.data?.items) {
-      // Alternative API structure
       const shuffled = data.data.items.sort(() => 0.5 - Math.random());
-      similarMovies.value = shuffled.slice(0, 12);
-      console.log('✅ Similar movies loaded (alt):', similarMovies.value.length);
-    } else {
-      console.error('❌ No items found in response');
-      console.error('❌ Available keys:', Object.keys(data));
-      similarMovies.value = [];
+      movies = shuffled.slice(0, 12);
     }
+    
+    if (movies.length === 0) {
+      console.error('❌ No items found in response');
+      similarMovies.value = [];
+      return;
+    }
+    
+    console.log('✅ Similar movies loaded:', movies.length);
+    
+    // Fetch details for each movie to get content
+    const moviesWithDetails = await Promise.all(
+      movies.map(async (movie) => {
+        try {
+          const detailResponse = await fetch(`https://phimapi.com/phim/${movie.slug}`);
+          const detailData = await detailResponse.json();
+          if (detailData.movie) {
+            return {
+              ...movie,
+              content: detailData.movie.content || movie.content,
+              description: detailData.movie.description || movie.description
+            };
+          }
+          return movie;
+        } catch (error) {
+          console.log('⚠️ Could not fetch details for:', movie.slug);
+          return movie;
+        }
+      })
+    );
+    
+    similarMovies.value = moviesWithDetails;
+    console.log('✅ Similar movies with details loaded:', similarMovies.value.length);
+    
   } catch (error) {
     console.error('❌ Error fetching similar movies:', error);
     similarMovies.value = [];
