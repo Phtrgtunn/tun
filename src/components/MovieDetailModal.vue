@@ -34,7 +34,7 @@
             <iframe
               v-if="movieData?.trailer_url"
               ref="youtubePlayer"
-              :key="getYoutubeEmbedUrl(movieData.trailer_url)"
+              :key="getYoutubeVideoId(movieData.trailer_url)"
               :src="getYoutubeEmbedUrl(movieData.trailer_url)"
               class="w-full h-full"
               frameborder="0"
@@ -390,14 +390,21 @@ const toggleShowMore = () => {
 
 const youtubePlayer = ref(null);
 const iframeReady = ref(false);
+const initialMuteState = ref(true);
+
+const getYoutubeVideoId = (url) => {
+  if (!url) return '';
+  return url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1] || '';
+};
 
 const getYoutubeEmbedUrl = (url) => {
   if (!url) return '';
-  const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
-  const muteParam = isMuted.value ? '1' : '0';
+  const videoId = getYoutubeVideoId(url);
+  // Use initialMuteState instead of isMuted to prevent URL changes on toggle
+  const muteParam = initialMuteState.value ? '1' : '0';
   // Parameters to hide YouTube branding and controls:
   // autoplay=1 - auto play video
-  // mute - mute/unmute based on state
+  // mute - mute/unmute based on initial state
   // controls=0 - hide player controls
   // showinfo=0 - hide title (deprecated but still works sometimes)
   // modestbranding=1 - hide YouTube logo
@@ -625,6 +632,7 @@ watch(() => props.isOpen, (newVal) => {
     showAllSimilar.value = false;
     showFullDescription.value = false;
     isMuted.value = true; // Reset mute state
+    initialMuteState.value = true; // Reset initial mute state
   }
 }, { immediate: true });
 </script>
