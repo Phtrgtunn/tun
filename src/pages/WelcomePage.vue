@@ -1,39 +1,91 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-white via-blue-50 to-indigo-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 font-inter">
-    <main class="bg-white p-6 sm:p-8 lg:p-10 rounded-3xl shadow-2xl ring-1 ring-blue-100/50 max-w-2xl w-full text-center
-                 transform opacity-0 scale-95 animate-fade-in-up">
-      <div class="space-y-6">
-        <p class="text-sm sm:text-base font-normal text-gray-500 uppercase tracking-widest">ỦY BAN NHÂN DÂN</p>
-        <p class="text-base sm:text-lg font-normal text-gray-600 uppercase tracking-widest">SỞ GIÁO DỤC VÀ ĐÀO TẠO</p>
-        <h1 class="text-lg sm:text-xl lg:text-2xl font-extrabold text-gray-800 uppercase">TRƯỜNG CAO ĐẲNG KINH TẾ THÀNH PHỐ HỒ CHÍ MINH</h1>
-        <p class="text-base sm:text-lg text-blue-500 font-semibold italic">ĐỒ ÁN THIẾT KẾ WEB NÂNG CAO</p>
+  <div class="min-h-screen bg-black relative overflow-hidden flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 opacity-20">
+      <div class="absolute top-0 left-0 w-96 h-96 bg-yellow-400 rounded-full filter blur-3xl animate-blob"></div>
+      <div class="absolute top-0 right-0 w-96 h-96 bg-yellow-600 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+      <div class="absolute bottom-0 left-1/2 w-96 h-96 bg-yellow-500 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+    </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-8 sm:gap-y-0 sm:gap-x-12 mt-10 border-t border-b border-gray-200 py-8">
-          <div class="text-left">
-            <p class="text-base sm:text-lg font-bold text-blue-600 mb-3">GIẢNG VIÊN HƯỚNG DẪN</p>
-            <p class="text-base sm:text-lg text-gray-700 hover:text-blue-700 transition-colors cursor-pointer">Phạm Đặng Phương</p>
-          </div>
-          <div class="text-left">
-            <p class="text-base sm:text-lg font-bold text-blue-600 mb-3">SINH VIÊN THỰC HIỆN</p>
-            <p class="text-base sm:text-lg text-gray-700 hover:text-blue-700 transition-colors cursor-pointer">Phạm Trung Tuấn</p>
-            <p class="text-base sm:text-lg text-gray-700 hover:text-blue-700 transition-colors cursor-pointer">Nguyễn Minh Huy</p>
-            <p class="text-base sm:text-lg text-gray-700 hover:text-blue-700 transition-colors cursor-pointer">Trần Lạc Khả Tú</p>
-            <p class="text-base sm:text-lg text-gray-700 hover:text-blue-700 transition-colors cursor-pointer">Nguyễn Lý Anh Thư</p>
+    <!-- Film Strip Decoration -->
+    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
+    <div class="absolute bottom-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
+
+    <main class="relative z-10 bg-gray-900/80 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-2xl border border-yellow-400/20 max-w-2xl w-full text-center transform opacity-0 scale-95 animate-fade-in-up">
+      <div class="space-y-5">
+        <!-- Logo Icon -->
+        <div class="flex justify-center mb-3">
+          <div class="relative">
+            <svg class="w-12 h-12 text-yellow-400 animate-pulse-slow" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+            </svg>
+            <div class="absolute -inset-2 bg-yellow-400/20 rounded-full blur-xl"></div>
           </div>
         </div>
 
-        <p class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 pt-10 drop-shadow-md">HTHREE-FILM</p>
+        <!-- Header -->
+        <div class="space-y-2">
+          <p class="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-[0.2em]">Ủy Ban Nhân Dân</p>
+          <p class="text-xs sm:text-sm font-medium text-gray-300 uppercase tracking-[0.15em]">Sở Giáo Dục và Đào Tạo</p>
+          <h1 class="text-sm sm:text-base font-bold text-white uppercase tracking-wide">
+            Trường Cao Đẳng Kinh Tế TP.HCM
+          </h1>
+          <p class="text-xs sm:text-sm text-yellow-400 font-semibold italic">Dự Án Web Thương Mại Điện Tử</p>
+        </div>
+
+        <!-- Team Info -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6 border-t border-b border-yellow-400/20 py-6">
+          <div class="text-left space-y-2">
+            <div class="flex items-center gap-2 mb-2">
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+              </svg>
+              <p class="text-xs sm:text-sm font-bold text-yellow-400 uppercase">Giảng Viên Hướng Dẫn</p>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-200 hover:text-yellow-400 transition-colors cursor-pointer pl-6">Phạm Đặng Phương</p>
+          </div>
+          
+          <div class="text-left space-y-2">
+            <div class="flex items-center gap-2 mb-2">
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+              </svg>
+              <p class="text-xs sm:text-sm font-bold text-yellow-400 uppercase">Sinh Viên Thực Hiện</p>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-200 hover:text-yellow-400 transition-colors cursor-pointer pl-6">Phạm Trung Tuấn</p>
+            <p class="text-xs sm:text-sm text-gray-200 hover:text-yellow-400 transition-colors cursor-pointer pl-6">Lê Anh Văn</p>
+            <p class="text-xs sm:text-sm text-gray-200 hover:text-yellow-400 transition-colors cursor-pointer pl-6">Trần Lạc Khả Tú</p>
+            <p class="text-xs sm:text-sm text-gray-200 hover:text-yellow-400 transition-colors cursor-pointer pl-6">Nguyễn Lý Anh Thư</p>
+          </div>
+        </div>
+
+        <!-- Brand Name -->
+        <div class="pt-4">
+          <h2 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 drop-shadow-2xl tracking-tight">
+            HTHREE
+          </h2>
+          <p class="text-base sm:text-lg text-yellow-400/80 font-light tracking-[0.4em] mt-1">FILM</p>
+        </div>
         
+        <!-- CTA Button -->
         <button
           @click="navigateToHomepage"
-          class="mt-12 px-10 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-lg rounded-full shadow-xl hover:shadow-2xl
-                 transition-all duration-300 transform hover:scale-105 active:scale-98
-                 focus:outline-none focus:ring-4 focus:ring-amber-300 focus:ring-opacity-75 relative overflow-hidden group"
+          class="mt-8 px-8 py-3 bg-yellow-400 text-black font-bold text-base rounded-full shadow-xl shadow-yellow-400/50
+                 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-yellow-400/70 active:scale-95
+                 focus:outline-none focus:ring-4 focus:ring-yellow-400/50 relative overflow-hidden group"
           aria-label="Vào Trang Web Chính"
         >
-          <span class="relative z-10">Vào Trang Web</span>
-          <span class="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+          <span class="relative z-10 flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+            </svg>
+            Khám Phá Ngay
+          </span>
+          <span class="absolute inset-0 bg-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
         </button>
+
+        <!-- Footer Note -->
+        <p class="text-[10px] text-gray-500 mt-6">© 2025 HTHREE Film</p>
       </div>
     </main>
   </div>
@@ -50,44 +102,72 @@ const navigateToHomepage = () => {
 </script>
 
 <style scoped>
-/* Import font Inter */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-/* Định nghĩa font Inter */
-.font-inter {
-  font-family: 'Inter', sans-serif;
-}
-
-/* Animation cho phần nội dung chính */
+/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
-    transform: scale(0.95);
+    transform: translateY(30px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
-    transform: scale(1);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -50px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(50px, 50px) scale(1.05);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
   }
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.8s ease-out forwards;
+  animation: fadeInUp 1s ease-out forwards;
 }
 
-/* Đảm bảo responsive tốt hơn cho text và padding */
+.animate-blob {
+  animation: blob 20s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
 @media (max-width: 640px) {
-  .text-xs { font-size: 0.65rem; }
-  .text-sm { font-size: 0.75rem; }
-  .text-base { font-size: 0.875rem; } /* Adjusted for better fit */
-  .text-lg { font-size: 1rem; }
-  .text-xl { font-size: 1.125rem; }
-  .text-2xl { font-size: 1.25rem; }
-  .text-3xl { font-size: 1.5rem; }
-  .text-4xl { font-size: 1.75rem; } /* Slightly smaller for very small screens */
-  .px-10 { padding-left: 2rem; padding-right: 2rem; } /* Adjusted padding */
-  .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-  .p-6, .p-8, .p-10 { padding: 1.25rem; } /* Adjusted card padding */
+  .tracking-\[0\.3em\] {
+    letter-spacing: 0.2em;
+  }
+  .tracking-\[0\.25em\] {
+    letter-spacing: 0.15em;
+  }
+  .tracking-\[0\.5em\] {
+    letter-spacing: 0.3em;
+  }
 }
 </style>

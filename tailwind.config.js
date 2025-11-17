@@ -7,5 +7,9 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require('daisyui')],
+  daisyui: {
+    themes: ["dark", "light"], // Có thể chọn theme: dark phù hợp với web phim
+    darkTheme: "dark", // Theme mặc định
+  },
 }

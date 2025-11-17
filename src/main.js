@@ -6,6 +6,7 @@ import { createPinia } from 'pinia';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Thêm auth
 import './index.css'; // Import CSS toàn cục
+import './assets/netflix.css'; // Import Netflix styles
 
 // --- Cấu hình Firebase (lấy từ Firebase Console) ---
 const firebaseConfig = {

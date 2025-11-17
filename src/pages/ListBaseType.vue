@@ -87,7 +87,7 @@ import FilterBar from '@/shared/FilterBar.vue';
 import MovieCardRecommended from '@/shared/MovieCardRecommended.vue';
 import Rank from '@/shared/Rank.vue';
 import { useRecommendedMoviesStore } from '@/stores/RecommendedMovies/recommendedMovies.js';
-import { supabase } from '@/supabaseClient';
+import { getPhimBo, getPhimLe, getHoatHinh, getTVShows, mapMovieData } from '@/services/movieApi';
 import { useCategoryStore } from '@/stores/Category/category';
 import { useCountryStore } from '@/stores/Country/country';
 
@@ -130,108 +130,85 @@ const currentBaseSlug = computed(() => {
 });
 
 
-// Hàm fetch phim từ Supabase
+// Hàm fetch phim từ API
 const fetchMovies = async () => {
-  console.log("--- Bắt đầu fetchMovies ---");
-  console.log("Route Name:", route.name);
-  console.log("Route Params:", route.params);
-  console.log("Route Query:", route.query);
-  console.log("Type Param (từ route.params.type):", typeParam.value);
-  console.log("Category Slug Param (từ route.params.categorySlug):", categorySlugParam.value);
-  console.log("Country Slug Param (từ route.params.countrySlug):", countrySlugParam.value);
-  console.log("Selected Category Query (từ route.query.category):", selectedCategoryQuery.value);
-  console.log("Selected Country Query (từ route.query.country):", selectedCountryQuery.value);
-  console.log("Selected Year Query (từ route.query.year):", selectedYearQuery.value);
-
+  console.log("--- Bắt đầu fetchMovies từ API ---");
+  console.log("Type Param:", typeParam.value);
+  console.log("Selected Category:", selectedCategoryQuery.value);
+  console.log("Selected Country:", selectedCountryQuery.value);
+  console.log("Selected Year:", selectedYearQuery.value);
+  console.log("Current Page:", currentPage.value);
 
   try {
-    let query = supabase.from('movies').select('*', { count: 'exact' });
+    // Build params cho API
+    const params = {
+      page: currentPage.value,
+      limit: itemsPerPage,
+      sort_field: 'modified.time',
+      sort_type: 'desc'
+    };
 
-    // Xác định bộ lọc chính từ các tham số của route
-    if (route.name === 'ListBaseType' && typeParam.value) { 
-      // VÍ DỤ: /list/phim-bo/page/1
-      query = query.eq('type', typeParam.value); 
-      console.log(`Lọc chính theo type: ${typeParam.value}`);
-    } else if (route.name === 'ListBaseCategory' && categorySlugParam.value) { 
-      // VÍ DỤ: /category/hanh-dong/page/1
-      // Lấy tên thể loại từ slug để lọc trong cột mảng `genres`
-      const categoryName = categoryStore.getAllCategories?.find(c => c.slug === categorySlugParam.value)?.name;
-      if (categoryName) {
-        query = query.contains('genres', [categoryName]); 
-        console.log(`Lọc chính theo thể loại (tên): ${categoryName}`);
-      } else {
-        console.warn(`Không tìm thấy tên thể loại cho slug: ${categorySlugParam.value}`);
-      }
-    } else if (route.name === 'ListBaseCountry' && countrySlugParam.value) { 
-      // VÍ DỤ: /country/an-do/page/1
-      // Lấy tên quốc gia từ slug để lọc trong cột mảng `country`
-      const countryName = countryStore.getAllCountries?.find(c => c.slug === countrySlugParam.value)?.name;
-      if (countryName) {
-        query = query.contains('country', [countryName]); 
-        console.log(`Lọc chính theo quốc gia (tên): ${countryName}`);
-      } else {
-        console.warn(`Không tìm thấy tên quốc gia cho slug: ${countrySlugParam.value}`);
-      }
+    // Lọc theo thể loại
+    if (selectedCategoryQuery.value) {
+      params.category = selectedCategoryQuery.value;
+      console.log('Áp dụng lọc theo Thể loại:', selectedCategoryQuery.value);
     }
 
-    // Áp dụng các bộ lọc bổ sung từ query parameters
-    // Đảm bảo không áp dụng lại bộ lọc chính nếu nó đã được xử lý từ params
-    if (selectedCategoryQuery.value && route.name !== 'ListBaseCategory') {
-      const categoryName = categoryStore.getAllCategories?.find(c => c.slug === selectedCategoryQuery.value)?.name;
-      if (categoryName) {
-        query = query.contains('genres', [categoryName]);
-        console.log(`Lọc phụ theo thể loại (tên): ${categoryName}`);
-      } else {
-        console.warn(`Không tìm thấy tên thể loại cho query slug: ${selectedCategoryQuery.value}`);
-      }
+    // Lọc theo quốc gia
+    if (selectedCountryQuery.value) {
+      params.country = selectedCountryQuery.value;
+      console.log('Áp dụng lọc theo Quốc gia:', selectedCountryQuery.value);
     }
-    if (selectedCountryQuery.value && route.name !== 'ListBaseCountry') {
-      const countryName = countryStore.getAllCountries?.find(c => c.slug === selectedCountryQuery.value)?.name;
-      if (countryName) {
-        query = query.contains('country', [countryName]);
-        console.log(`Lọc phụ theo quốc gia (tên): ${countryName}`);
-      } else {
-        console.warn(`Không tìm thấy tên quốc gia cho query slug: ${selectedCountryQuery.value}`);
-      }
-    }
+
+    // Lọc theo năm
     if (selectedYearQuery.value) {
-      query = query.eq('year', parseInt(selectedYearQuery.value));
-      console.log(`Lọc phụ theo năm: ${selectedYearQuery.value}`);
+      const year = parseInt(selectedYearQuery.value);
+      if (!isNaN(year)) {
+        params.year = year;
+        console.log('Áp dụng lọc theo Năm:', year);
+      }
     }
 
-    // Tính toán offset và limit cho phân trang
-    const startIndex = (currentPage.value - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage - 1;
-    query = query.range(startIndex, endIndex);
-
-    // Sắp xếp theo created_at giảm dần (phim mới nhất)
-    query = query.order('created_at', { ascending: false });
-
-    // --- LOG SUPABASE QUERY TRƯỚC KHI THỰC THI ---
-    console.log("Supabase Query Object (before execution):", query);
-
-    const { data, error, count } = await query;
-
-    console.log("Supabase Response Data:", data);
-    console.log("Supabase Response Error:", error);
-    console.log("Supabase Response Count:", count);
-
-    if (error) {
-      console.error('Lỗi khi fetch phim từ Supabase:', error);
+    // Gọi API tương ứng với type
+    let response;
+    if (typeParam.value === 'phim-bo') {
+      response = await getPhimBo(params);
+    } else if (typeParam.value === 'phim-le') {
+      response = await getPhimLe(params);
+    } else if (typeParam.value === 'hoat-hinh') {
+      response = await getHoatHinh(params);
+    } else if (typeParam.value === 'tv-shows') {
+      response = await getTVShows(params);
+    } else {
+      console.warn('Type không hợp lệ:', typeParam.value);
       movies.value = [];
-      totalPage.value = 1;
+      totalPages.value = 1;
       return;
     }
 
-    movies.value = data || [];
-    totalPage.value = Math.ceil(count / itemsPerPage) || 1;
-    console.log(`Tổng số trang: ${totalPage.value}`);
-    console.log("--- Kết thúc fetchMovies ---");
+    console.log("API Response:", response);
+
+    if (response.status && response.data) {
+      movies.value = (response.data.items || []).map(mapMovieData);
+      
+      // Tính tổng số trang từ pagination
+      const pagination = response.data.params?.pagination;
+      if (pagination) {
+        totalPages.value = pagination.totalPages || 1;
+      }
+
+      console.log('Phim đã tải từ API:', movies.value.length, 'phim');
+      console.log('Tổng số trang:', totalPages.value);
+    } else {
+      console.warn('API không trả về dữ liệu hợp lệ');
+      movies.value = [];
+      totalPages.value = 1;
+    }
 
   } catch (error) {
-    console.error('Lỗi khi fetch phim:', error);
+    console.error('Lỗi khi fetch phim từ API:', error);
     movies.value = [];
-    totalPage.value = 1;
+    totalPages.value = 1;
   }
 };
 

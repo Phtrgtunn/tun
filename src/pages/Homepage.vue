@@ -1,256 +1,520 @@
 <template>
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen relative overflow-hidden">
-    <!-- Hiệu ứng nền động -->
-    <div class="absolute inset-0 z-0">
-      <div class="absolute w-64 h-64 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-      <div class="absolute w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div class="absolute w-64 h-64 bg-teal-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-    </div>
-
-    <!-- Phần Phim Đề Cử -->
-    <section class="mb-16 relative z-10">
-      <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-8 text-center relative inline-block">
-        <span class="bg-white/80 px-6 py-2 rounded-lg shadow-md backdrop-blur-sm">Phim Đề Cử</span>
-        <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></span>
-      </h2>
-      <div class="relative overflow-hidden rounded-2xl shadow-xl bg-white/90 backdrop-blur-md border border-gray-200 transform hover:scale-[1.01] transition-all duration-500">
-        <!-- Container cho carousel -->
-        <div
-          class="flex transition-transform duration-700 ease-out-quart"
-          :style="carouselStyle"
-          ref="carousel"
-          @wheel="handleWheel"
-        >
-          <template v-if="recommendedMoviesStore.getRecommended?.length > 0">
-            <div
-              v-for="(item, i) in recommendedMoviesStore.getRecommended"
-              :key="`movie-${i}`"
-              class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 flex-shrink-0 px-2 py-4 transform hover:-translate-y-3 hover:shadow-xl transition-all duration-300"
-            >
-              <MovieCardRecommended :movie="item" :trending="true" class="rounded-xl overflow-hidden" />
-            </div>
-          </template>
-          <p v-else class="text-center text-gray-500 py-12 text-lg font-medium animate-pulse bg-gray-100/50 rounded-lg w-full">
-            {{ error ? error : 'Đang tải hoặc không có phim đề cử...' }}
-          </p>
+  <div class="bg-black min-h-screen text-white">
+    <!-- Hero Banner Carousel -->
+    <div 
+      ref="heroBannerRef"
+      class="relative h-[85vh] overflow-hidden group/hero pt-16"
+      @wheel="handleWheel"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+    >
+      <!-- Banners Loop -->
+      <div 
+        v-for="(movie, index) in featuredMovies" 
+        :key="movie.slug"
+        class="absolute inset-0 transition-opacity duration-700"
+        :class="currentBannerIndex === index ? 'opacity-100 z-10' : 'opacity-0 z-0'"
+      >
+        <!-- Video Trailer -->
+        <div v-if="showTrailer && currentBannerIndex === index && currentTrailerUrl" class="absolute inset-0 z-10 overflow-hidden">
+          <iframe
+            :src="currentTrailerUrl"
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77vh] h-[56.25vw] min-h-full min-w-full"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+            style="pointer-events: none;"
+          ></iframe>
+          <!-- Overlay để che logo YouTube -->
+          <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute top-0 right-0 w-32 h-20 bg-black"></div>
+          </div>
         </div>
 
-        <!-- Nút điều hướng carousel -->
-        <button
-          v-if="recommendedMoviesStore.getRecommended?.length > slidesPerView"
-          @click="prevSlide"
-          class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-indigo-600/80 hover:bg-indigo-700 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg transform hover:scale-110 transition-all duration-300 animate-pulse-slow"
-          aria-label="Slide trước"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m12 19-7-7 7-7" />
-            <path d="M19 12H5" />
-          </svg>
-        </button>
-        <button
-          v-if="recommendedMoviesStore.getRecommended?.length > slidesPerView"
-          @click="nextSlide"
-          class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-indigo-600/80 hover:bg-indigo-700 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg transform hover:scale-110 transition-all duration-300 animate-pulse-slow"
-          aria-label="Slide tiếp theo"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-        </button>
+        <!-- Background Image - chỉ hiện khi không có trailer -->
+        <div v-if="!showTrailer || currentBannerIndex !== index" class="absolute inset-0">
+          <img 
+            :src="getBannerImage(movie)"
+            class="w-full h-full object-cover"
+            :alt="movie.name"
+            @error="handleImageError"
+          />
+          <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+        </div>
+
+        <div class="relative z-10 h-full flex items-center container mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+          <div class="max-w-2xl">
+            <!-- Title -->
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-3 uppercase tracking-tight leading-tight text-white" style="text-shadow: 3px 3px 10px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.9), 0 0 50px rgba(0,0,0,0.7);">
+              {{ movie?.name || 'KHÁM PHÁ PHIM HAY' }}
+            </h1>
+            
+            <!-- Origin Name -->
+            <p class="text-base md:text-lg text-white mb-4 font-semibold" style="text-shadow: 2px 2px 8px rgba(0,0,0,1), 0 0 15px rgba(0,0,0,0.8);">
+              {{ movie?.origin_name || '' }}
+            </p>
+
+            <!-- Badges -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span v-if="movie?.quality" class="bg-yellow-500 text-black px-3 py-1 rounded text-xs font-bold uppercase shadow-xl">
+                {{ movie.quality }}
+              </span>
+              <span v-if="movie?.lang" class="bg-gray-900/90 text-white px-3 py-1 rounded text-xs font-bold uppercase shadow-xl border-2 border-gray-700">
+                {{ movie.lang }}
+              </span>
+              <span v-if="movie?.year" class="bg-gray-900/90 text-white px-3 py-1 rounded text-xs font-bold shadow-xl border-2 border-gray-700">
+                {{ movie.year }}
+              </span>
+              <span v-if="movie?.time" class="bg-gray-900/90 text-white px-3 py-1 rounded text-xs font-bold shadow-xl border-2 border-gray-700">
+                {{ movie.time }}
+              </span>
+            </div>
+
+            <!-- Categories -->
+            <div v-if="movie?.category?.length" class="flex flex-wrap gap-2 mb-5 text-sm">
+              <span 
+                v-for="(genre, i) in movie.category.slice(0, 4)" 
+                :key="i"
+                class="text-white font-bold"
+                style="text-shadow: 2px 2px 6px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.9);"
+              >
+                {{ genre.name }}
+              </span>
+            </div>
+
+            <!-- Description -->
+            <p class="text-sm md:text-base mb-6 line-clamp-3 text-white leading-relaxed max-w-xl font-semibold" style="text-shadow: 2px 2px 8px rgba(0,0,0,1), 0 0 15px rgba(0,0,0,0.9);">
+              {{ movie?.content || 'Khám phá những bộ phim tuyệt vời cùng HTHREE' }}
+            </p>
+
+            <!-- Buttons -->
+            <div class="flex flex-wrap gap-3">
+              <button 
+                @click="playMovie(movie)"
+                class="flex items-center gap-2 bg-yellow-400 text-black px-8 py-3.5 rounded-full font-bold text-base hover:bg-yellow-500 transition-all shadow-xl hover:scale-105"
+              >
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                </svg>
+                Xem Ngay
+              </button>
+              <button 
+                class="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 py-3.5 rounded-full font-bold text-base hover:bg-white/30 transition-all border border-white/30"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <button 
+                @click="playMovie(movie)"
+                class="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 py-3.5 rounded-full font-bold text-base hover:bg-white/30 transition-all border border-white/30"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
 
-    <!-- Phần Quảng Cáo -->
-    <Advertiserment class="mb-16" />
+      <!-- Dots Indicator -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        <button
+          v-for="(movie, index) in featuredMovies"
+          :key="`dot-${movie.slug}`"
+          @click="goToBanner(index)"
+          class="transition-all duration-500 ease-out rounded-full transform hover:scale-125"
+          :class="currentBannerIndex === index 
+            ? 'w-10 h-2.5 bg-yellow-400 shadow-lg shadow-yellow-400/50' 
+            : 'w-2.5 h-2.5 bg-white/50 hover:bg-white/80'"
+        ></button>
+      </div>
+    </div>
 
-    <!-- Phần Phim Mới Cập Nhật -->
-    <NewMovieUpdate
-      :update="updateNew"
-      :series="series"
-      :movie="movie"
-      :recommended="recommendedMoviesStore.getRecommended"
-      class="mb-16"
-    >
-      <template #title>
-        <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-8 text-center relative inline-block">
-          <span class="bg-white/80 px-6 py-2 rounded-lg shadow-md backdrop-blur-sm">Phim Mới Cập Nhật</span>
-          <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"></span>
-        </h2>
-      </template>
-    </NewMovieUpdate>
+    <!-- Movie Sections -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-10 relative z-20">
+      <!-- Phim Đề Cử -->
+      <MovieRow 
+        v-if="recommendedMovies?.length"
+        title="🔥 Phim Đề Cử" 
+        :movies="recommendedMovies"
+      />
+
+      <!-- Phim Mới Cập Nhật -->
+      <MovieRow 
+        v-if="newMovies?.length"
+        title="🆕 Phim Mới Cập Nhật" 
+        :movies="newMovies"
+      />
+
+      <!-- Phim Bộ -->
+      <MovieRow 
+        v-if="seriesMovies?.length"
+        title="📺 Phim Bộ Hot" 
+        :movies="seriesMovies"
+      />
+
+      <!-- Phim Lẻ -->
+      <MovieRow 
+        v-if="singleMovies?.length"
+        title="🎬 Phim Lẻ Mới" 
+        :movies="singleMovies"
+      />
+
+      <!-- Phim Hàn Quốc -->
+      <MovieRow 
+        v-if="koreanMovies?.length"
+        title="🇰🇷 Phim Hàn Quốc" 
+        :movies="koreanMovies"
+      />
+
+      <!-- Phim Trung Quốc -->
+      <MovieRow 
+        v-if="chineseMovies?.length"
+        title="🇨🇳 Phim Trung Quốc" 
+        :movies="chineseMovies"
+      />
+
+      <!-- Phim Anime -->
+      <MovieRow 
+        v-if="animeMovies?.length"
+        title="🎌 Phim Anime" 
+        :movies="animeMovies"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
-import MovieCardRecommended from '@/shared/MovieCardRecommended.vue';
-import Advertiserment from '@/shared/Advertiserment.vue';
-import NewMovieUpdate from '@/shared/NewMovieUpdate.vue';
-import { useRecommendedMoviesStore } from '../stores/RecommendedMovies/recommendedMovies';
+import MovieRow from '@/components/MovieRow.vue';
 
-// State quản lý danh sách phim
-const updateNew = ref([]);
-const series = ref([]);
-const movie = ref([]);
-const currentSlide = ref(0);
-const error = ref(null);
+const router = useRouter();
 
-// Khởi tạo Pinia store
-const recommendedMoviesStore = useRecommendedMoviesStore();
+const featuredMovies = ref([]); // Danh sách 3-5 phim featured
+const currentBannerIndex = ref(0);
+const recommendedMovies = ref([]);
+const newMovies = ref([]);
+const seriesMovies = ref([]);
+const singleMovies = ref([]);
+const koreanMovies = ref([]);
+const chineseMovies = ref([]);
+const animeMovies = ref([]);
+const showTrailer = ref(false);
+const currentTrailerUrl = ref('');
+let autoSlideInterval = null;
+const heroBannerRef = ref(null);
+let touchStartX = 0;
+let touchEndX = 0;
+let isScrolling = false;
 
-// Tính số slide hiển thị dựa trên breakpoint
-const slidesPerView = computed(() => {
-  const width = window.innerWidth;
-  if (width >= 1280) return 5; // xl:w-1/5
-  if (width >= 1024) return 4; // lg:w-1/4
-  if (width >= 768) return 3; // md:w-1/3
-  if (width >= 640) return 2; // sm:w-1/2
-  return 1; // w-full
-});
+const featuredMovie = computed(() => featuredMovies.value[currentBannerIndex.value] || null);
 
-// Tính toán style cho carousel
-const carouselStyle = computed(() => ({
-  transform: `translateX(-${(currentSlide.value * 100) / slidesPerView.value}%)`,
-}));
-
-// Hàm điều hướng carousel
-const nextSlide = () => {
-  if (recommendedMoviesStore.getRecommended?.length > 0) {
-    const maxSlides = Math.ceil(recommendedMoviesStore.getRecommended.length / slidesPerView.value) - 1;
-    if (currentSlide.value < maxSlides) {
-      currentSlide.value++;
-    }
+const playMovie = (movie) => {
+  if (movie?.slug) {
+    router.push(`/film/${movie.slug}`);
   }
 };
 
-const prevSlide = () => {
-  if (currentSlide.value > 0) {
-    currentSlide.value--;
+const getBannerImage = (movie) => {
+  if (!movie) return 'https://image.tmdb.org/t/p/original/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg';
+  
+  // Ưu tiên thumb_url (ảnh ngang cho banner)
+  if (movie.thumb_url) {
+    const url = movie.thumb_url.startsWith('http') 
+      ? movie.thumb_url 
+      : `https://img.phimapi.com/${movie.thumb_url}`;
+    console.log('✅ Banner using thumb_url:', url);
+    return url;
   }
+  
+  // Fallback poster_url
+  if (movie.poster_url) {
+    return movie.poster_url.startsWith('http') 
+      ? movie.poster_url 
+      : `https://img.phimapi.com/${movie.poster_url}`;
+  }
+  
+  return 'https://image.tmdb.org/t/p/original/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg';
 };
 
-// Xử lý lăn chuột
-const handleWheel = (event) => {
-  event.preventDefault();
-  if (event.deltaY > 0) {
-    nextSlide();
+const handleImageError = (e) => {
+  e.target.src = 'https://image.tmdb.org/t/p/original/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg';
+};
+
+const playTrailer = (url) => {
+  if (!url) {
+    showTrailer.value = false;
+    currentTrailerUrl.value = '';
+    return;
+  }
+  
+  // Convert YouTube URL to embed with autoplay và HD quality
+  let embedUrl = url;
+  if (url.includes('youtube.com/watch')) {
+    const videoId = url.split('v=')[1]?.split('&')[0];
+    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}&iv_load_policy=3&disablekb=1&fs=0&vq=hd1080&hd=1&quality=highres`;
+  } else if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}&iv_load_policy=3&disablekb=1&fs=0&vq=hd1080&hd=1&quality=highres`;
+  }
+  
+  // Delay để smooth transition
+  showTrailer.value = false;
+  setTimeout(() => {
+    currentTrailerUrl.value = embedUrl;
+    showTrailer.value = true;
+  }, 500);
+};
+
+const nextBanner = () => {
+  currentBannerIndex.value = (currentBannerIndex.value + 1) % featuredMovies.value.length;
+  const currentMovie = featuredMovies.value[currentBannerIndex.value];
+  if (currentMovie?.trailer_url) {
+    playTrailer(currentMovie.trailer_url);
   } else {
-    prevSlide();
+    showTrailer.value = false;
   }
 };
 
-// Fetch dữ liệu khi component được mount
+const prevBanner = () => {
+  currentBannerIndex.value = currentBannerIndex.value === 0 
+    ? featuredMovies.value.length - 1 
+    : currentBannerIndex.value - 1;
+  const currentMovie = featuredMovies.value[currentBannerIndex.value];
+  if (currentMovie?.trailer_url) {
+    playTrailer(currentMovie.trailer_url);
+  } else {
+    showTrailer.value = false;
+  }
+};
+
+const goToBanner = (index) => {
+  currentBannerIndex.value = index;
+  const currentMovie = featuredMovies.value[index];
+  if (currentMovie?.trailer_url) {
+    playTrailer(currentMovie.trailer_url);
+  } else {
+    showTrailer.value = false;
+  }
+};
+
+const startAutoSlide = () => {
+  // Tắt auto slide - chỉ chuyển khi user tương tác
+  // autoSlideInterval = setInterval(() => {
+  //   nextBanner();
+  // }, 10000);
+};
+
+const stopAutoSlide = () => {
+  if (autoSlideInterval) {
+    clearInterval(autoSlideInterval);
+  }
+};
+
+const resetAutoSlide = () => {
+  // Không reset auto slide nữa
+  // stopAutoSlide();
+  // startAutoSlide();
+};
+
+const handleWheel = (event) => {
+  if (isScrolling) return;
+  
+  // Chỉ xử lý scroll ngang (horizontal scroll)
+  if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+    event.preventDefault();
+    isScrolling = true;
+    
+    if (event.deltaX > 0) {
+      nextBanner();
+    } else {
+      prevBanner();
+    }
+    
+    setTimeout(() => {
+      isScrolling = false;
+    }, 800);
+  }
+};
+
+const handleTouchStart = (event) => {
+  touchStartX = event.changedTouches[0].screenX;
+};
+
+const handleTouchMove = (event) => {
+  touchEndX = event.changedTouches[0].screenX;
+};
+
+const handleTouchEnd = () => {
+  if (isScrolling) return;
+  
+  const swipeDistance = touchStartX - touchEndX;
+  const minSwipeDistance = 50;
+  
+  if (Math.abs(swipeDistance) > minSwipeDistance) {
+    isScrolling = true;
+    
+    if (swipeDistance > 0) {
+      // Swipe left - next
+      nextBanner();
+    } else {
+      // Swipe right - prev
+      prevBanner();
+    }
+    
+    setTimeout(() => {
+      isScrolling = false;
+    }, 800);
+  }
+};
+
 onMounted(async () => {
   try {
-    // Lấy danh sách phim đề cử từ Pinia store
-    if (!recommendedMoviesStore.getRecommended?.length) {
-      await recommendedMoviesStore.getRecommendedMovies();
-    }
-    if (!recommendedMoviesStore.getRecommended?.length) {
-      error.value = 'Không có phim đề cử nào!';
-      toast.error(error.value);
-    }
-
-    // Fetch dữ liệu phim mới, phim bộ, phim lẻ
-    const [resUpdateNew, resSeries, resMovie] = await Promise.all([
-      axios.get('https://phimapi.com/v1/api/danh-sach/phim-bo?page=2&sort_field=_id&sort_type=asc&year=2025&limit=15'),
-      axios.get('https://phimapi.com/v1/api/danh-sach/phim-bo?page=3&sort_field=_id&sort_type=asc&year=2025&limit=8'),
-      axios.get('https://phimapi.com/v1/api/danh-sach/phim-le?page=1&sort_field=_id&sort_type=asc&year=2025&limit=8'),
+    console.log('🚀 Loading movies from API...');
+    
+    const [
+      resFeatured,
+      resRecommended,
+      resNew,
+      resSeries,
+      resSingle,
+      resKorean,
+      resChinese,
+      resAnime,
+      resMyHeroAcademia
+    ] = await Promise.all([
+      axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat?page=1'),
+      axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat?page=1'),
+      axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat?page=2'),
+      axios.get('https://phimapi.com/v1/api/danh-sach/phim-bo?page=1&limit=30'),
+      axios.get('https://phimapi.com/v1/api/danh-sach/phim-le?page=1&limit=30'),
+      axios.get('https://phimapi.com/v1/api/quoc-gia/han-quoc?page=1&limit=25'),
+      axios.get('https://phimapi.com/v1/api/quoc-gia/trung-quoc?page=1&limit=25'),
+      axios.get('https://phimapi.com/v1/api/quoc-gia/nhat-ban?page=1&limit=25'),
+      axios.get('https://phimapi.com/v1/api/tim-kiem?keyword=hoc vien sieu anh hung'),
     ]);
 
-    updateNew.value = resUpdateNew.data.data?.items || [];
-    series.value = resSeries.data.data?.items || [];
-    movie.value = resMovie.data.data?.items || [];
-
-    if (!updateNew.value.length && !series.value.length && !movie.value.length) {
-      error.value = 'Không thể tải dữ liệu phim!';
-      toast.error(error.value);
+    // Thêm "Học viện siêu anh hùng" làm phim ĐẦU TIÊN
+    const myHeroAcademiaList = resMyHeroAcademia.data.data?.items || [];
+    if (myHeroAcademiaList.length > 0) {
+      const myHeroMovie = myHeroAcademiaList[0];
+      try {
+        const detailRes = await axios.get(`https://phimapi.com/phim/${myHeroMovie.slug}`);
+        if (detailRes.data?.movie) {
+          featuredMovies.value.push({
+            ...myHeroMovie,
+            content: detailRes.data.movie.content || myHeroMovie.content,
+            trailer_url: detailRes.data.movie.trailer_url
+          });
+        } else {
+          featuredMovies.value.push(myHeroMovie);
+        }
+      } catch (err) {
+        featuredMovies.value.push(myHeroMovie);
+      }
     }
+    
+    // Lấy 2 phim featured tiếp theo
+    const featuredList = resFeatured.data.items?.slice(0, 2) || resFeatured.data.data?.items?.slice(0, 2) || [];
+    
+    // Fetch chi tiết cho 2 phim featured
+    for (const movie of featuredList) {
+      if (movie?.slug) {
+        try {
+          const detailRes = await axios.get(`https://phimapi.com/phim/${movie.slug}`);
+          if (detailRes.data?.movie) {
+            featuredMovies.value.push({
+              ...movie,
+              content: detailRes.data.movie.content || movie.content,
+              trailer_url: detailRes.data.movie.trailer_url
+            });
+          } else {
+            featuredMovies.value.push(movie);
+          }
+        } catch (err) {
+          featuredMovies.value.push(movie);
+        }
+      }
+    }
+    
+    // Auto play trailer của phim đầu tiên nếu có
+    if (featuredMovies.value[0]?.trailer_url) {
+      playTrailer(featuredMovies.value[0].trailer_url);
+    }
+    
+    console.log('✅ Featured movies loaded:', featuredMovies.value.length);
+    
+    // Sắp xếp phim đề cử theo năm mới nhất và quality cao
+    const recommended = resRecommended.data.items || resRecommended.data.data?.items || [];
+    recommendedMovies.value = recommended.sort((a, b) => {
+      // Ưu tiên quality cao (FHD > HD > SD)
+      const qualityOrder = { 'FHD': 3, 'HD': 2, 'SD': 1, '': 0 };
+      const qualityA = qualityOrder[a.quality] || 0;
+      const qualityB = qualityOrder[b.quality] || 0;
+      
+      if (qualityA !== qualityB) {
+        return qualityB - qualityA; // Quality cao hơn lên trước
+      }
+      
+      // Nếu quality bằng nhau, ưu tiên năm mới hơn
+      const yearA = parseInt(a.year) || 0;
+      const yearB = parseInt(b.year) || 0;
+      return yearB - yearA;
+    });
+    
+    newMovies.value = resNew.data.items || resNew.data.data?.items || [];
+    seriesMovies.value = resSeries.data.data?.items || [];
+    singleMovies.value = resSingle.data.data?.items || [];
+    koreanMovies.value = resKorean.data.data?.items || [];
+    chineseMovies.value = resChinese.data.data?.items || [];
+    animeMovies.value = resAnime.data.data?.items || [];
+
+    console.log('✅ Movies loaded successfully');
+    console.log('🎬 Featured:', featuredMovie.value?.name);
+    console.log('📝 Content:', featuredMovie.value?.content?.substring(0, 100));
+    
+    // Không start auto slide nữa - chỉ chuyển khi user tương tác
   } catch (err) {
-    console.error('Lỗi khi tải dữ liệu:', err);
-    error.value = 'Không thể tải dữ liệu phim. Vui lòng thử lại sau!';
-    toast.error(error.value);
+    console.error('❌ Error loading movies:', err);
+    toast.error('Không thể tải dữ liệu phim');
   }
+});
+
+onUnmounted(() => {
+  stopAutoSlide();
 });
 </script>
 
 <style scoped>
-/* Tùy chỉnh nút điều hướng */
-button {
-  transition: background-color 0.3s ease, transform 0.3s ease;
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Hiệu ứng nền động */
-.animate-blob {
-  animation: move 15s infinite ease-in-out;
+/* Ẩn scrollbar hoặc làm mỏng hơn */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.animation-delay-4000 {
-  animation-delay: 4s;
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
 
-@keyframes move {
-  0%, 100% { transform: translate(0, 0); }
-  25% { transform: translate(20%, -20%); }
-  50% { transform: translate(-20%, 20%); }
-  75% { transform: translate(10%, 10%); }
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
-
-/* Hiệu ứng pulse chậm cho nút */
-.animate-pulse-slow {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-/* Responsive layout */
-@media (max-width: 640px) {
-  .container { padding-left: 1rem; padding-right: 1rem; }
-}
-
-@media (max-width: 768px) {
-  .w-1 { width: 50% !important; }
-}
-
-@media (min-width: 1280px) {
-  .container { max-width: 1280px; }
-}
-
-/* Hiệu ứng loading */
-.animate-pulse {
-  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Đảm bảo carousel hiển thị */
-.flex { display: flex; flex-wrap: nowrap; }
 </style>

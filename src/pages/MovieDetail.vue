@@ -30,7 +30,7 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+    <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-6 space-y-8">
       <div class="flex flex-col lg:flex-row gap-8">
         <!-- Movie Poster and Info -->
         <div class="lg:w-2/3">
@@ -57,11 +57,11 @@
               </div>
             </div>
             <img
-              :src="movieData.poster_path || 'https://placehold.co/400x600/ccc/fff?text=No+Image'"
-              :alt="`Poster phim ${movieData.title}`"
+              :src="movieData.backdrop_path || movieData.poster_path || 'https://placehold.co/1200x675/ccc/fff?text=No+Image'"
+              :alt="`Backdrop phim ${movieData.title}`"
               class="w-full h-auto rounded-lg object-cover mb-4"
               loading="lazy"
-              onerror="this.onerror=null;this.src='https://placehold.co/400x600/ccc/fff?text=No+Image';"
+              onerror="this.onerror=null;this.src='https://placehold.co/1200x675/ccc/fff?text=No+Image';"
             />
             <p class="text-gray-300 mb-4">{{ movieData.overview }}</p>
             <div class="flex flex-wrap gap-2">
@@ -205,7 +205,7 @@ const convertYoutubeUrlToEmbed = (url) => {
 // URL embed cho trailer
 const embedUrl = ref(null);
 
-// Fetch chi tiết phim từ Supabase
+// Fetch chi tiết phim từ API phimapi.com
 const fetchMovieDetail = async () => {
   loading.value = true;
   error.value = null;
@@ -220,34 +220,53 @@ const fetchMovieDetail = async () => {
       return;
     }
 
-    const { data, error: supabaseError } = await supabase
-      .from('movies')
-      .select('*')
-      .eq('slug', filmSlug.value) 
-      .single(); 
+    // Import getMovieDetail từ service
+    const { getMovieDetail } = await import('@/services/movieApi');
+    const response = await getMovieDetail(filmSlug.value);
 
-    console.log('moviedetail.vue: Supabase response data:', data);
-    console.log('moviedetail.vue: Supabase response error:', supabaseError);
+    console.log('moviedetail.vue: API response:', response);
+    console.log('moviedetail.vue: response.status:', response.status);
+    console.log('moviedetail.vue: response.movie:', response.movie);
 
-    if (supabaseError) {
-      if (supabaseError.code === 'PGRST116') { 
-        error.value = 'Không tìm thấy thông tin phim với slug này.';
-        console.error('moviedetail.vue: Lỗi Supabase - Không tìm thấy phim:', filmSlug.value);
-      } else {
-        error.value = `Lỗi Supabase: ${supabaseError.message}`;
-        console.error('moviedetail.vue: Lỗi Supabase khác:', supabaseError);
-      }
-    } else if (data) {
-      movieData.value = data;
+    if (response.status && response.movie) {
+      const movie = response.movie;
+      
+      // Map data từ API sang format cũ
+      movieData.value = {
+        id: movie._id,
+        title: movie.name,
+        original_title: movie.origin_name,
+        slug: movie.slug,
+        overview: movie.content,
+        poster_path: movie.poster_url,
+        backdrop_path: movie.thumb_url,
+        release_date: movie.year ? `${movie.year}-01-01` : null,
+        vote_average: movie.tmdb?.vote_average || 0,
+        vote_count: movie.tmdb?.vote_count || 0,
+        runtime: movie.time,
+        genres: movie.category?.map(c => c.name) || [],
+        country: movie.country?.map(c => c.name) || [],
+        actor: movie.actor || [],
+        director: movie.director || [],
+        quality: movie.quality,
+        lang: movie.lang,
+        episode_current: movie.episode_current,
+        episode_total: movie.episode_total,
+        trailer_url: movie.trailer_url,
+        episodes: movie.episodes || [],
+        year: movie.year
+      };
+      
       embedUrl.value = convertYoutubeUrlToEmbed(movieData.value.trailer_url);
       console.log('moviedetail.vue: Đã tải thành công dữ liệu phim:', movieData.value);
-      // Gọi hàm fetch phim liên quan sau khi có movieData và genres
+      
+      // Fetch phim liên quan
       if (movieData.value.genres && movieData.value.genres.length > 0) {
         fetchRelatedMovies(movieData.value.genres, movieData.value.id);
       }
     } else {
-      error.value = 'Không tìm thấy thông tin phim.'; 
-      console.warn('moviedetail.vue: Không tìm thấy dữ liệu phim, data là null.');
+      error.value = 'Không tìm thấy thông tin phim với slug này.'; 
+      console.warn('moviedetail.vue: API không trả về dữ liệu phim.');
     }
   } catch (err) {
     console.error('moviedetail.vue: Lỗi không xác định khi fetch chi tiết phim:', err);

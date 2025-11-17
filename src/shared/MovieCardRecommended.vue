@@ -5,10 +5,12 @@
     class="relative block w-full aspect-[2/3] rounded-md overflow-hidden group transition-transform duration-300 ease-out hover:scale-105"
   >
     <img
-      :src="movie?.backdrop_path"
-      :alt="movie.title || 'Movie Poster'"
+      :src="getImageUrl(movie)"
+      :alt="movie?.title || movie?.name || 'Movie Poster'"
       class="w-full h-full object-cover"
-      onerror="this.onerror=null;this.src='https://placehold.co/400x600/ccc/fff?text=No+Image';"
+      @error="handleImageError"
+      @load="handleImageLoad"
+      loading="lazy"
     />
     <div
       class="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
@@ -30,16 +32,16 @@
     <div class="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3 text-white z-10">
       <h3
         class="text-sm sm:text-base font-bold truncate group-hover:whitespace-normal group-hover:text-phim-red transition-colors"
-        :title="movie.title"
+        :title="movie?.title || movie?.name"
       >
-        {{ movie.title }}
+        {{ movie?.title || movie?.name }}
       </h3>
       <p
-        v-if="movie.original_title"
+        v-if="movie?.original_title || movie?.origin_name"
         class="text-xs text-gray-300 truncate group-hover:whitespace-normal"
-        :title="movie.original_title"
+        :title="movie?.original_title || movie?.origin_name"
       >
-        {{ movie.original_title }}
+        {{ movie?.original_title || movie?.origin_name }}
       </p>
     </div>
     <div
@@ -79,17 +81,56 @@ const props = defineProps({
   },
 });
 
-// Watcher này chỉ dùng để debug, có thể xóa sau khi xác nhận hiển thị đúng
-watch(() => props.movie, (newMovie) => {
-  if (newMovie) {
-    console.log('MovieCardRecommended: movie prop received:', newMovie);
-    console.log('MovieCardRecommended: movie.poster_path:', newMovie.backdrop_path);
-    console.log('MovieCardRecommended: movie.title:', newMovie.title); 
-    console.log('MovieCardRecommended: movie.original_title:', newMovie.original_title); 
-  } else {
-    console.log('MovieCardRecommended: movie prop is null or undefined.');
+// Get image URL with fallback
+const getImageUrl = (movie) => {
+  if (!movie) {
+    return 'https://via.placeholder.com/400x600/1a1a1a/ffffff?text=No+Movie';
   }
-}, { immediate: true }); 
+  
+  // Try different image sources
+  // poster_path = ảnh dọc (dùng cho card)
+  // backdrop_path = ảnh ngang (dùng cho banner)
+  const imageUrl = movie.poster_path || movie.poster_url || movie.backdrop_path || movie.thumb_url;
+  
+  // Debug log - Check which image is used
+  if (movie.title === 'Hai Cuộc Đời Một Trái Tim (Bác Sĩ Tim)' || movie.name === 'Hai Cuộc Đời Một Trái Tim (Bác Sĩ Tim)') {
+    console.log('🔍 First movie image check:', {
+      title: movie.title || movie.name,
+      backdrop_path: movie.backdrop_path,
+      poster_path: movie.poster_path,
+      selected: imageUrl
+    });
+  }
+  
+  if (!imageUrl) {
+    return 'https://via.placeholder.com/400x600/1a1a1a/ffffff?text=No+Image';
+  }
+  
+  // If URL is relative, add base URL
+  if (!imageUrl.startsWith('http')) {
+    // Add base URL for phimimg.com (silent fix)
+    return `https://phimimg.com/${imageUrl}`;
+  }
+  
+  // WORKAROUND: If phimimg.com has CORS issue, use proxy
+  // Uncomment this if images don't load:
+  // if (imageUrl.includes('phimimg.com')) {
+  //   return `https://images.weserv.nl/?url=${encodeURIComponent(imageUrl)}`;
+  // }
+  
+  return imageUrl;
+};
+
+// Handle image load success
+const handleImageLoad = (e) => {
+  // Silent success
+};
+
+// Handle image error
+const handleImageError = (e) => {
+  // Set placeholder silently
+  e.target.src = 'https://via.placeholder.com/400x600/1a1a1a/ffffff?text=Error';
+}; 
 </script>
 
 <style scoped>

@@ -2,21 +2,26 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 // Import các component View (trang)
-// Đảm bảo các đường dẫn này chính xác với cấu trúc thư mục của bạn
-import WelcomePage from '../pages/WelcomePage.vue'; // Import WelcomePage
-import Homepage from '../pages/Homepage.vue';
+import WelcomePage from '../pages/WelcomePage.vue';
+import Homepage from '../pages/Homepage.vue'; // Trang chủ chính
+import NetflixHomepage from '../pages/NetflixHomepage.vue'; // Netflix style (backup)
 import MovieDetail from '../pages/MovieDetail.vue';
 import WatchMovie from '../pages/WatchMovie.vue';
 import ListBaseType from '../pages/ListBaseType.vue';
 import ListBaseCategory from '../pages/ListBaseCategory.vue';
 import ListBaseNational from '../pages/ListBaseNational.vue';
 import Contact from '../pages/Contact.vue';
-import Auth from '../pages/Auth.vue';
-import Account from '../pages/Account.vue'; // Import trang Account
+import Account from '../pages/Account.vue';
+import DemoUI from '../pages/DemoUI.vue';
+import TestImages from '../pages/TestImages.vue';
+import SearchResults from '../pages/SearchResults.vue';
 
 const routes = [
-  { path: '/', name: 'Welcome', component: WelcomePage }, // WelcomePage hiển thị đầu tiên
-  { path: '/home', name: 'Homepage', component: Homepage }, // Trang chủ thực sự
+  { path: '/', name: 'Welcome', component: WelcomePage },
+  { path: '/home', name: 'Homepage', component: Homepage }, // Trang chủ chính
+  { path: '/netflix', name: 'NetflixHome', component: NetflixHomepage }, // Netflix style (backup)
+  { path: '/demo', name: 'DemoUI', component: DemoUI }, // Trang demo DaisyUI
+  { path: '/test-images', name: 'TestImages', component: TestImages }, // Test images page
   { path: '/film/:filmName', name: 'MovieDetail', component: MovieDetail, props: true },
   { path: '/film/:filmName/tap/:tap', name: 'WatchMovie', component: WatchMovie, props: true },
   { 
@@ -38,8 +43,8 @@ const routes = [
     props: true 
   },
   { path: '/contact', name: 'Contact', component: Contact },
-  { path: '/auth', name: 'Auth', component: Auth },
   { path: '/account', name: 'Account', component: Account }, // Thêm route cho trang tài khoản
+  { path: '/search', name: 'Search', component: SearchResults }, // Trang tìm kiếm
 ];
 
 const router = createRouter({

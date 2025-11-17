@@ -1,7 +1,10 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-gray-50">
+  <!-- Splash Screen -->
+  <SplashScreen />
+  
+  <div class="flex flex-col min-h-screen" :class="isHomepage ? 'bg-black' : 'bg-gray-50'">
     <!-- Navbar luôn hiển thị -->
-    <Navbar class="shadow-md" />
+    <Navbar :class="isHomepage ? 'bg-black/90' : 'shadow-md'" />
 
     <!-- Trạng thái đang kiểm tra đăng nhập -->
     <div
@@ -46,13 +49,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import Navbar from '@/shared/Navbar.vue';
+import Navbar from '@/components/NetflixNavbar.vue';
+import SplashScreen from '@/components/SplashScreen.vue';
 import { toast } from 'vue3-toastify';
 
+const route = useRoute();
 const user = ref(undefined);
 const auth = getAuth();
+
+const isHomepage = computed(() => route.path === '/home');
 
 onMounted(() => {
   const timeout = setTimeout(() => {
@@ -76,6 +84,6 @@ onMounted(() => {
 
 <style>
 body {
-  padding-top: 64px; /* Khớp với min-h-[64px] của Navbar */
+  padding-top: 0;
 }
 </style>

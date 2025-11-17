@@ -124,7 +124,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { supabase } from '@/supabaseClient'; 
+import { getMovieList, mapMovieData } from '@/services/movieApi';
 import FilterBar from '@/shared/FilterBar.vue';
 import MovieCardRecommended from '@/shared/MovieCardRecommended.vue';
 import Rank from '@/shared/Rank.vue';
@@ -187,14 +187,14 @@ const countryName = computed(() => {
   return null;
 });
 
-// Hàm chính để fetch phim từ Supabase
+// Hàm chính để fetch phim từ API
 const fetchMovies = async () => {
   loading.value = true;
   error.value = null;
   movies.value = [];
   totalPage.value = 1;
 
-  console.log('ListBaseCategory: Bắt đầu fetchMovies.');
+  console.log('ListBaseCategory: Bắt đầu fetchMovies từ API.');
   console.log('ListBaseCategory: Selected Category Slug (query):', selectedCategoryQuery.value);
   console.log('ListBaseCategory: Selected Country Slug (query):', selectedCountry.value);
   console.log('ListBaseCategory: Selected Year (query):', selectedYear.value);
@@ -202,70 +202,63 @@ const fetchMovies = async () => {
   console.log('ListBaseCategory: Current Page:', currentPage.value);
 
   try {
-    let queryBuilder = supabase.from('movies').select('*', { count: 'exact' });
+    // Build params cho API
+    const params = {
+      page: currentPage.value,
+      limit: MOVIES_PER_PAGE,
+      sort_field: 'modified.time',
+      sort_type: 'desc'
+    };
 
-    // Lọc theo Thể loại:
-    // Ưu tiên categoryName từ selectedCategoryQuery, sau đó là categorySlug
-    const currentCategoryFilterName = categoryName.value;
-    if (currentCategoryFilterName) {
-      console.log('ListBaseCategory: Áp dụng lọc theo Thể loại:', currentCategoryFilterName);
-      queryBuilder = queryBuilder.contains('genres', [currentCategoryFilterName]);
-    } else if ((categorySlug.value || selectedCategoryQuery.value) && categoryStore.getAllCategories.length > 0) {
-      console.warn(`ListBaseCategory: Không tìm thấy tên thể loại cho slug: '${categorySlug.value || selectedCategoryQuery.value}'. Không áp dụng lọc theo thể loại.`);
-    } else {
-      console.log('ListBaseCategory: Không có slug thể loại hợp lệ hoặc dữ liệu thể loại chưa tải.');
+    // Lọc theo thể loại (ưu tiên selectedCategoryQuery, sau đó categorySlug)
+    const categoryFilter = selectedCategoryQuery.value || categorySlug.value;
+    if (categoryFilter) {
+      params.category = categoryFilter;
+      console.log('ListBaseCategory: Áp dụng lọc theo Thể loại:', categoryFilter);
     }
 
-    // Lọc theo Quốc gia:
-    const currentCountryFilterName = countryName.value;
-    if (currentCountryFilterName) {
-      console.log('ListBaseCategory: Áp dụng lọc theo Quốc gia:', currentCountryFilterName);
-      queryBuilder = queryBuilder.contains('country', [currentCountryFilterName]);
-    } else if (selectedCountry.value && countryStore.getAllCountries.length > 0) {
-      console.warn(`ListBaseCategory: Không tìm thấy tên quốc gia cho slug: '${selectedCountry.value}'. Không áp dụng lọc theo quốc gia.`);
-    } else {
-      console.log('ListBaseCategory: Không có slug quốc gia hợp lệ hoặc dữ liệu quốc gia chưa tải.');
+    // Lọc theo quốc gia
+    if (selectedCountry.value) {
+      params.country = selectedCountry.value;
+      console.log('ListBaseCategory: Áp dụng lọc theo Quốc gia:', selectedCountry.value);
     }
 
-    // Lọc theo Năm:
+    // Lọc theo năm
     if (selectedYear.value) {
       const year = parseInt(selectedYear.value);
       if (!isNaN(year)) {
+        params.year = year;
         console.log('ListBaseCategory: Áp dụng lọc theo Năm:', year);
-        queryBuilder = queryBuilder.eq('year', year);
       }
+    }
+
+    // Gọi API
+    const response = await getMovieList(params);
+
+    if (response.status && response.data) {
+      movies.value = (response.data.items || []).map(mapMovieData);
+      
+      // Tính tổng số trang từ pagination
+      const pagination = response.data.params?.pagination;
+      if (pagination) {
+        totalPage.value = pagination.totalPages || 1;
+      }
+
+      console.log('ListBaseCategory: Phim đã tải từ API:', movies.value.length, 'phim');
+      console.log('ListBaseCategory: Tổng số trang:', totalPage.value);
     } else {
-      console.log('ListBaseCategory: Không có năm được chọn.');
+      console.warn('ListBaseCategory: API không trả về dữ liệu hợp lệ');
+      movies.value = [];
+      totalPage.value = 1;
     }
-
-    // Thiết lập phân trang
-    const startIndex = (currentPage.value - 1) * MOVIES_PER_PAGE;
-    const endIndex = startIndex + MOVIES_PER_PAGE - 1;
-    queryBuilder = queryBuilder.range(startIndex, endIndex);
-
-    // Sắp xếp theo created_at giảm dần (phim mới nhất)
-    queryBuilder = queryBuilder.order('created_at', { ascending: false });
-
-    // Thực hiện truy vấn và lấy tổng số lượng (count)
-    const { data, count, error: supabaseError } = await queryBuilder;
-
-    if (supabaseError) {
-      throw supabaseError; // Ném lỗi nếu có lỗi từ Supabase
-    }
-
-    movies.value = data || []; // Gán dữ liệu phim vào ref
-    totalPage.value = Math.ceil((count || 0) / MOVIES_PER_PAGE); // Tính tổng số trang
-
-    console.log("ListBaseCategory: Phim đã tải từ Supabase:", movies.value);
-    console.log("ListBaseCategory: Tổng số lượng phim:", count, "Tổng số trang:", totalPage.value);
 
   } catch (err) {
-    console.error('Lỗi khi fetch phim từ Supabase (ListBaseCategory):', err);
+    console.error('Lỗi khi fetch phim từ API (ListBaseCategory):', err);
     error.value = 'Không thể tải dữ liệu phim. Vui lòng thử lại sau.';
     movies.value = [];
     totalPage.value = 1;
   } finally {
-    loading.value = false; // Luôn tắt loading
+    loading.value = false;
     console.log('ListBaseCategory: Kết thúc fetchMovies. Loading:', loading.value, 'Error:', error.value);
   }
 };
