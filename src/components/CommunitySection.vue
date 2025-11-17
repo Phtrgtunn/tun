@@ -96,7 +96,7 @@
             <span class="text-base">🔥</span>
             <h3 class="text-sm font-bold text-white uppercase">SÔI NỔI NHẤT</h3>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-2 mb-3">
             <div v-for="(movie, i) in trendingMovies" :key="i" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-800/50 transition cursor-pointer">
               <span class="text-yellow-400 font-bold text-xs w-5">{{ i + 1 }}</span>
               <img :src="movie.poster" class="w-8 h-11 rounded object-cover" @error="(e) => e.target.src = 'https://placehold.co/32x44/1a1a1a/fff?text=?'" />
@@ -106,6 +106,9 @@
               </div>
             </div>
           </div>
+          <button @click="showTrendingModal = true" class="w-full py-2 text-xs text-yellow-400 hover:text-yellow-300 font-medium transition-colors border-t border-gray-800 pt-3">
+            Xem thêm →
+          </button>
         </div>
 
         <!-- Yêu Thích Nhất -->
@@ -114,7 +117,7 @@
             <span class="text-base">💛</span>
             <h3 class="text-sm font-bold text-white uppercase">YÊU THÍCH NHẤT</h3>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-2 mb-3">
             <div v-for="(movie, i) in favoriteMovies" :key="i" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-800/50 transition cursor-pointer">
               <span class="text-yellow-400 font-bold text-xs w-5">{{ i + 1 }}</span>
               <img :src="movie.poster" class="w-8 h-11 rounded object-cover" @error="(e) => e.target.src = 'https://placehold.co/32x44/1a1a1a/fff?text=?'" />
@@ -124,6 +127,9 @@
               </div>
             </div>
           </div>
+          <button @click="showFavoriteModal = true" class="w-full py-2 text-xs text-yellow-400 hover:text-yellow-300 font-medium transition-colors border-t border-gray-800 pt-3">
+            Xem thêm →
+          </button>
         </div>
 
         <!-- Bình Luận Mới -->
@@ -149,6 +155,60 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Sôi Nổi Nhất -->
+    <div v-if="showTrendingModal" @click="showTrendingModal = false" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div @click.stop class="bg-gray-900 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden border border-gray-800">
+        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🔥</span>
+            <h2 class="text-xl font-bold text-white">SÔI NỘI NHẤT</h2>
+          </div>
+          <button @click="showTrendingModal = false" class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[calc(80vh-80px)]">
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div v-for="(movie, i) in trendingMoviesAll" :key="i" class="group cursor-pointer">
+              <div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-2">
+                <img :src="movie.poster" :alt="movie.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" @error="(e) => e.target.src = 'https://placehold.co/200x300/1a1a1a/fff?text=No+Image'" />
+                <div class="absolute top-2 left-2 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">{{ i + 1 }}</div>
+              </div>
+              <p class="text-white text-sm font-medium line-clamp-2">{{ movie.title }}</p>
+              <p class="text-gray-400 text-xs">{{ movie.year }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Yêu Thích Nhất -->
+    <div v-if="showFavoriteModal" @click="showFavoriteModal = false" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div @click.stop class="bg-gray-900 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden border border-gray-800">
+        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">💛</span>
+            <h2 class="text-xl font-bold text-white">YÊU THÍCH NHẤT</h2>
+          </div>
+          <button @click="showFavoriteModal = false" class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[calc(80vh-80px)]">
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div v-for="(movie, i) in favoriteMoviesAll" :key="i" class="group cursor-pointer">
+              <div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-2">
+                <img :src="movie.poster" :alt="movie.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" @error="(e) => e.target.src = 'https://placehold.co/200x300/1a1a1a/fff?text=No+Image'" />
+                <div class="absolute top-2 left-2 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">{{ i + 1 }}</div>
+              </div>
+              <p class="text-white text-sm font-medium line-clamp-2">{{ movie.title }}</p>
+              <p class="text-gray-400 text-xs">{{ movie.year }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -163,7 +223,11 @@ const topScrollRef = ref(null);
 const topComments = ref([]);
 
 const trendingMovies = ref([]);
+const trendingMoviesAll = ref([]);
 const favoriteMovies = ref([]);
+const favoriteMoviesAll = ref([]);
+const showTrendingModal = ref(false);
+const showFavoriteModal = ref(false);
 
 const recentComments = ref([
   { id: 1, name: 'Hoang Gang', avatar: 'https://ui-avatars.com/api/?name=Hoang&background=f59e0b&color=000', time: 'vừa xong', text: 'luôn là bộ phim tuyệt vời nhất mà tôi từng xem' },
@@ -184,7 +248,7 @@ const fetchMoviesFromAPI = async () => {
     console.log('🎬 API Response:', response.data);
     
     if (response.data?.items?.length) {
-      const movies = response.data.items.slice(0, 20);
+      const movies = response.data.items.slice(0, 30);
       
       // Update Top Comments với 8 phim đầu
       const sampleComments = [
@@ -210,8 +274,8 @@ const fetchMoviesFromAPI = async () => {
         };
       });
       
-      // Lấy 3 phim tiếp cho Trending
-      trendingMovies.value = movies.slice(8, 11).map(movie => {
+      // Lấy tất cả phim cho Trending (hiển thị 5, lưu tất cả)
+      trendingMoviesAll.value = movies.slice(8, 18).map(movie => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
         return {
           title: movie.name,
@@ -219,9 +283,10 @@ const fetchMoviesFromAPI = async () => {
           poster: posterUrl.startsWith('http') ? posterUrl : `https://img.phimapi.com/${posterUrl}`
         };
       });
+      trendingMovies.value = trendingMoviesAll.value.slice(0, 5);
       
-      // Lấy 3 phim tiếp cho Favorites
-      favoriteMovies.value = movies.slice(11, 14).map(movie => {
+      // Lấy tất cả phim cho Favorites (hiển thị 5, lưu tất cả)
+      favoriteMoviesAll.value = movies.slice(18, 28).map(movie => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
         return {
           title: movie.name,
@@ -229,6 +294,7 @@ const fetchMoviesFromAPI = async () => {
           poster: posterUrl.startsWith('http') ? posterUrl : `https://img.phimapi.com/${posterUrl}`
         };
       });
+      favoriteMovies.value = favoriteMoviesAll.value.slice(0, 5);
       
       console.log('✅ Top Comments:', topComments.value);
       console.log('✅ Trending:', trendingMovies.value);
