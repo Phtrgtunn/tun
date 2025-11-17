@@ -192,7 +192,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import authService from '@/services/authService';
-import { toast } from 'vue3-toastify';
+import { useToast } from '@/composables/useToast';
 import { 
   getAuth, 
   signInWithPopup, 
@@ -202,6 +202,7 @@ import {
 const router = useRouter();
 const auth = getAuth();
 const googleProvider = new GoogleAuthProvider();
+const toast = useToast();
 
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
@@ -247,13 +248,13 @@ const handleSubmit = async () => {
       
       if (response.status) {
         success.value = response.message;
-        toast.success('Đăng nhập thành công!');
+        toast.success('🎉 Đăng nhập thành công!');
         setTimeout(() => {
           router.push('/home');
         }, 1000);
       } else {
         error.value = response.message;
-        toast.error(response.message);
+        toast.error('❌ ' + response.message);
       }
     } else {
       // Đăng ký
@@ -266,7 +267,7 @@ const handleSubmit = async () => {
       
       if (response.status) {
         success.value = response.message + ' - Đang chuyển sang đăng nhập...';
-        toast.success('Đăng ký thành công!');
+        toast.success('🎉 Đăng ký thành công! Chào mừng bạn!');
         setTimeout(() => {
           isLogin.value = true;
           username.value = response.user.username;
@@ -274,12 +275,12 @@ const handleSubmit = async () => {
         }, 1500);
       } else {
         error.value = response.message;
-        toast.error(response.message);
+        toast.error('❌ ' + response.message);
       }
     }
   } catch (err) {
     error.value = 'Có lỗi xảy ra. Vui lòng thử lại.';
-    toast.error('Có lỗi xảy ra');
+    toast.error('❌ Có lỗi xảy ra. Vui lòng thử lại!');
     console.error('Auth error:', err);
   } finally {
     loading.value = false;
@@ -305,7 +306,7 @@ const handleGoogleAuth = async () => {
     }));
     localStorage.setItem('token', user.accessToken);
     
-    toast.success('Đăng nhập Google thành công!');
+    toast.success('🎉 Đăng nhập Google thành công!');
     setTimeout(() => {
       router.push('/home');
     }, 1000);
@@ -318,7 +319,7 @@ const handleGoogleAuth = async () => {
     } else {
       error.value = 'Đăng nhập Google thất bại';
     }
-    toast.error(error.value);
+    toast.error('❌ ' + error.value);
   } finally {
     loading.value = false;
   }

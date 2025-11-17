@@ -70,8 +70,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { getAuth } from 'firebase/auth';
+import { ref, onMounted } from 'vue';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import axios from 'axios';
 import { useToast } from '@/composables/useToast';
 
@@ -87,7 +87,49 @@ const props = defineProps({
 const emit = defineEmits(['comment-added', 'login']);
 
 const auth = getAuth();
-const user = computed(() => auth.currentUser);
+const user = ref(null);
+
+// Load user from both Firebase and PHP
+const loadUser = () => {
+  // Check Firebase first
+  const firebaseUser = auth.currentUser;
+  if (firebaseUser) {
+    user.value = firebaseUser;
+    console.log('🔐 CommentForm - Firebase user:', firebaseUser.email);
+    return;
+  }
+  
+  // Check PHP localStorage as fallback
+  const phpUser = localStorage.getItem('user');
+  if (phpUser) {
+    try {
+      user.value = JSON.parse(phpUser);
+      console.log('🔐 CommentForm - PHP user:', user.value?.email);
+    } catch (e) {
+      console.error('Error parsing PHP user:', e);
+    }
+  }
+};
+
+// Listen to auth state changes
+onMounted(() => {
+  // Load initial user
+  loadUser();
+  
+  // Listen for Firebase auth changes
+  onAuthStateChanged(auth, (currentUser) => {
+    if (currentUser) {
+      user.value = currentUser;
+      console.log('🔐 CommentForm - Firebase auth changed:', currentUser.email);
+    } else {
+      // If Firebase logout, check PHP
+      loadUser();
+    }
+  });
+  
+  // Listen for localStorage changes (PHP login/logout)
+  window.addEventListener('storage', loadUser);
+});
 
 const commentText = ref('');
 const isSubmitting = ref(false);
@@ -131,50 +173,63 @@ const submitComment = async () => {
   isSubmitting.value = true;
   
   try {
+    // Determine if user is from Firebase or PHP
+    const isFirebaseUser = !!user.value.uid;
+    const isPhpUser = !!user.value.id;
+    
     console.log('🚀 Submitting comment...', {
+      type: isFirebaseUser ? 'Firebase' : 'PHP',
       email: user.value.email,
-      displayName: user.value.displayName,
+      displayName: user.value.displayName || user.value.full_name,
       uid: user.value.uid,
-      photoURL: user.value.photoURL
+      id: user.value.id
     });
     
-    // Upload avatar to server if user has photoURL from Firebase
-    let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.displayName || user.value.email.split('@')[0])}&background=f59e0b&color=000&size=128`;
+    let userId;
     
-    console.log('📸 Checking photoURL:', user.value.photoURL);
-    
-    if (user.value.photoURL) {
-      try {
-        const uploadResponse = await axios.post(`${API_URL}/upload_avatar.php`, {
-          firebase_uid: user.value.uid,
-          photo_url: user.value.photoURL
-        });
-        
-        if (uploadResponse.data.success) {
-          avatarUrl = uploadResponse.data.avatar_url;
-          console.log('✅ Avatar uploaded:', avatarUrl);
+    if (isFirebaseUser) {
+      // Firebase user - need to register/get from database
+      let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.displayName || user.value.email.split('@')[0])}&background=f59e0b&color=000&size=128`;
+      
+      if (user.value.photoURL) {
+        try {
+          const uploadResponse = await axios.post(`${API_URL}/upload_avatar.php`, {
+            firebase_uid: user.value.uid,
+            photo_url: user.value.photoURL
+          });
+          
+          if (uploadResponse.data.success) {
+            avatarUrl = uploadResponse.data.avatar_url;
+            console.log('✅ Avatar uploaded:', avatarUrl);
+          }
+        } catch (error) {
+          console.log('⚠️ Avatar upload failed, using fallback');
         }
-      } catch (error) {
-        console.log('⚠️ Avatar upload failed, using fallback');
       }
+      
+      // Register/Get user from database
+      const userResponse = await axios.post(`${API_URL}/users.php`, {
+        firebase_uid: user.value.uid,
+        email: user.value.email,
+        username: user.value.email.split('@')[0],
+        full_name: user.value.displayName || user.value.email.split('@')[0],
+        avatar: avatarUrl
+      });
+      
+      console.log('👤 Firebase user response:', userResponse.data);
+      
+      if (!userResponse.data.success) {
+        throw new Error('Failed to register/get user');
+      }
+      
+      userId = userResponse.data.user.id;
+    } else if (isPhpUser) {
+      // PHP user - already has ID
+      userId = user.value.id;
+      console.log('👤 PHP user ID:', userId);
+    } else {
+      throw new Error('Invalid user type');
     }
-    
-    // Register/Get user from database
-    const userResponse = await axios.post(`${API_URL}/users.php`, {
-      firebase_uid: user.value.uid,
-      email: user.value.email,
-      username: user.value.email.split('@')[0],
-      full_name: user.value.displayName || user.value.email.split('@')[0],
-      avatar: avatarUrl
-    });
-    
-    console.log('👤 User response:', userResponse.data);
-    
-    if (!userResponse.data.success) {
-      throw new Error('Failed to register/get user');
-    }
-    
-    const userId = userResponse.data.user.id;
     
     // Submit comment
     const response = await axios.post(`${API_URL}/comments.php`, {

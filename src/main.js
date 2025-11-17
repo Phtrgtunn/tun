@@ -4,7 +4,7 @@ import App from './App.vue';
 import router from './router'; // Import router đã cấu hình tại src/router/index.js
 import { createPinia } from 'pinia';
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Thêm auth
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'firebase/auth'; // Thêm auth
 import './index.css'; // Import CSS toàn cục
 import './assets/netflix.css'; // Import Netflix styles
 
@@ -21,6 +21,11 @@ const firebaseConfig = {
 // Khởi tạo Firebase
 const appFirebase = initializeApp(firebaseConfig);
 const auth = getAuth(appFirebase); // Lấy instance auth
+
+// Set persistence để lưu session đăng nhập
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error('Error setting persistence:', error);
+});
 
 // Tạo ứng dụng Vue
 const app = createApp(App);

@@ -102,9 +102,11 @@ import {
   updateProfile,
   onAuthStateChanged
 } from 'firebase/auth';
+import { useToast } from '@/composables/useToast';
 
 // Initialize router for navigation
 const router = useRouter();
+const toast = useToast();
 
 // Get auth instance for login and registration
 const auth = getAuth();
@@ -154,14 +156,17 @@ const handleSubmit = async () => {
     if (isLogin.value) {
       await signInWithEmailAndPassword(auth, email.value, password.value);
       console.log('Đăng nhập thành công');
+      toast.success('🎉 Đăng nhập thành công!');
     } else {
       const res = await createUserWithEmailAndPassword(auth, email.value, password.value);
       await updateProfile(res.user, { displayName: username.value || 'Người dùng' });
       console.log('Đăng ký thành công');
+      toast.success('🎉 Đăng ký thành công! Chào mừng bạn!');
     }
     router.push('/');
   } catch (err) {
     error.value = getErrorMessage(err.code);
+    toast.error(getErrorMessage(err.code));
   } finally {
     loading.value = false;
   }
@@ -178,12 +183,15 @@ const handleGoogleAuth = async () => {
       // For registration, ensure displayName is set if provided
       await updateProfile(user, { displayName: user.displayName || username.value || 'Người dùng' });
       console.log('Đăng ký bằng Google thành công');
+      toast.success('🎉 Đăng ký bằng Google thành công! Chào mừng bạn!');
     } else {
       console.log('Đăng nhập bằng Google thành công');
+      toast.success('🎉 Đăng nhập bằng Google thành công!');
     }
     router.push('/');
   } catch (err) {
     error.value = getErrorMessage(err.code);
+    toast.error(getErrorMessage(err.code));
   } finally {
     loading.value = false;
   }

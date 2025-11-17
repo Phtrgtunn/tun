@@ -366,14 +366,16 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { getAuth, signOut } from 'firebase/auth';
+import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
 import { useCategoryStore } from '@/stores/Category/category.js';
 import authService from '@/services/authService';
 import AuthModal from './AuthModal.vue';
+import { useToast } from '@/composables/useToast';
 
 const router = useRouter();
 const categoryStore = useCategoryStore();
 const auth = getAuth();
+const toast = useToast();
 
 const scrolled = ref(false);
 const searchQuery = ref('');
@@ -387,12 +389,38 @@ const showAuthModal = ref(false);
 // Load categories from store
 categoryStore.getCategory();
 
-// Load user from localStorage (PHP or Google)
+// Load user from both Firebase and PHP
 const loadUser = () => {
-  const userData = authService.getCurrentUser();
-  if (userData) {
-    user.value = userData;
+  // Check Firebase first
+  const firebaseUser = auth.currentUser;
+  if (firebaseUser) {
+    user.value = firebaseUser;
+    console.log('🔐 Navbar - Firebase user:', firebaseUser.email);
+    return;
   }
+  
+  // Check PHP localStorage as fallback
+  const phpUser = authService.getCurrentUser();
+  if (phpUser) {
+    user.value = phpUser;
+    console.log('🔐 Navbar - PHP user:', phpUser.email);
+  }
+  
+  // Listen for Firebase auth changes
+  onAuthStateChanged(auth, (currentUser) => {
+    if (currentUser) {
+      user.value = currentUser;
+      console.log('🔐 Navbar - Firebase auth changed:', currentUser.email);
+    } else {
+      // If Firebase logout, check PHP
+      const phpUser = authService.getCurrentUser();
+      if (phpUser) {
+        user.value = phpUser;
+      } else {
+        user.value = null;
+      }
+    }
+  });
 };
 
 const categories = computed(() => {
@@ -481,10 +509,16 @@ const handleLogout = async () => {
     // Clear user
     user.value = null;
     
-    // Reload page để update navbar
-    window.location.reload();
+    // Show toast
+    toast.success('👋 Đã đăng xuất thành công!');
+    
+    // Reload page sau 1s để user thấy toast
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   } catch (error) {
     console.error('Logout error:', error);
+    toast.error('❌ Lỗi khi đăng xuất. Vui lòng thử lại!');
   }
 };
 
