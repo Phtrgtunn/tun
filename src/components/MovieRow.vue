@@ -98,6 +98,13 @@
     <!-- Preview Card (Small) - Render outside using Teleport -->
   </div>
 
+  <!-- Movie Detail Modal -->
+  <MovieDetailModal
+    :is-open="isModalOpen"
+    :movie-slug="selectedMovieSlug"
+    @close="isModalOpen = false"
+  />
+
   <!-- Preview Card Portal -->
   <Teleport to="body">
     <div
@@ -158,9 +165,13 @@
                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
               </svg>
             </button>
-            <button class="w-8 h-8 bg-gray-800 hover:bg-gray-700 hover:scale-110 rounded-lg flex items-center justify-center transition-all duration-300 group/btn">
+            <button
+              @click.stop="openMovieDetail(previewMovie)"
+              class="w-8 h-8 bg-gray-800 hover:bg-gray-700 hover:scale-110 rounded-lg flex items-center justify-center transition-all duration-300 group/btn"
+              title="Các tập & Thông tin"
+            >
               <svg class="w-3.5 h-3.5 text-white group-hover/btn:text-yellow-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
           </div>
@@ -230,6 +241,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import MovieDetailModal from './MovieDetailModal.vue';
 
 const props = defineProps({
   title: {
@@ -250,8 +262,18 @@ const showPreview = ref(false);
 const previewMovie = ref(null);
 const previewPosition = ref({});
 const keepPreviewOpen = ref(false);
+const isModalOpen = ref(false);
+const selectedMovieSlug = ref('');
 let hoverTimer = null;
 let observer = null;
+
+const openMovieDetail = (movie) => {
+  if (movie?.slug) {
+    selectedMovieSlug.value = movie.slug;
+    isModalOpen.value = true;
+    closePreview(); // Đóng preview card khi mở modal
+  }
+};
 
 const getMovieImage = (movie) => {
   // Ưu tiên poster_url từ API phimapi.com (ảnh dọc cho card)
