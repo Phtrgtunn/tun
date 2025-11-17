@@ -10,13 +10,13 @@ import './assets/netflix.css'; // Import Netflix styles
 
 // --- Cấu hình Firebase (lấy từ Firebase Console) ---
 const firebaseConfig = {
-  apiKey: "AIzaSyAiwMHCsSrqX20x8o90R5hksRxUPVmnwKM",
-  authDomain: "hthree-94a3e.firebaseapp.com",
-  projectId: "hthree-94a3e",
-  storageBucket: "hthree-94a3e.firebasestorage.app",
-  messagingSenderId: "917487991713",
-  appId: "1:917487991713:web:68dd73293f38d7fe2229e0",
-  measurementId: "G-9LNBDMVK0M"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAiwMHCsSrqX20x8o90R5hksRxUPVmnwKM",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "hthree-94a3e.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "hthree-94a3e",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "hthree-94a3e.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "917487991713",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:917487991713:web:68dd73293f38d7fe2229e0",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-9LNBDMVK0M"
 };
 // Khởi tạo Firebase
 const appFirebase = initializeApp(firebaseConfig);

@@ -180,11 +180,19 @@
 
         <!-- User -->
         <div class="relative group">
-          <button class="flex items-center gap-2 bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button class="flex items-center gap-2 bg-gray-800 px-3 py-2 rounded-lg hover:bg-gray-700 hover:scale-105 transition-all duration-300">
+            <!-- User Avatar -->
+            <img 
+              v-if="user"
+              :src="user?.avatar || user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || user?.displayName || user?.username || 'User')}&background=f59e0b&color=000`"
+              class="w-7 h-7 rounded-full border-2 border-yellow-400 shadow-lg"
+              :alt="user?.full_name || user?.displayName || user?.username || 'User'"
+            />
+            <!-- Default Icon if not logged in -->
+            <svg v-else class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
-            <span class="text-sm font-medium text-white hidden md:block">Thành viên</span>
+            <span class="text-sm font-medium text-white hidden md:block">{{ user ? (user.displayName || user.username || 'Thành viên') : 'Thành viên' }}</span>
           </button>
           
           <!-- User Dropdown -->
