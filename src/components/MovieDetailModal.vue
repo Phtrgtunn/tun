@@ -208,12 +208,9 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-3">
-                    <!-- Movie Title -->
-                    <h4 class="text-white font-bold text-sm mb-2 line-clamp-1">{{ movie.name }}</h4>
-                    
+                  <div class="p-4">
                     <!-- Badges Row -->
-                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                    <div class="flex items-center gap-2 mb-3 flex-wrap">
                       <!-- Quality Badge -->
                       <span v-if="movie.quality" class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] font-bold rounded">{{ movie.quality }}</span>
                       <span v-else class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] font-bold rounded">HD</span>
@@ -239,9 +236,10 @@
                         </svg>
                       </button>
                     </div>
-                    <!-- Description -->
-                    <p class="text-gray-400 text-xs leading-relaxed line-clamp-3">
-                      {{ movie.content || movie.description || movie.origin_name || movie.name }}
+                    
+                    <!-- Description with ellipsis -->
+                    <p class="text-gray-300 text-sm leading-relaxed line-clamp-4 mb-1">
+                      {{ movie.content || movie.description || movie.origin_name || 'Một bộ phim hấp dẫn đang chờ bạn khám phá. Hãy xem ngay để biết thêm chi tiết về cốt truyện và dàn diễn viên.' }}
                     </p>
                   </div>
                 </div>
