@@ -68,29 +68,39 @@ const toast = useToast();
 
 const isHomepage = computed(() => route.path === '/home');
 
-// Set toast instance
+// Set toast instance and auth listener
 onMounted(() => {
   if (toastRef.value) {
     setToastInstance(toastRef.value);
   }
-});
-
-onMounted(() => {
-  const timeout = setTimeout(() => {
-    if (user.value === undefined) {
+  
+  // Auth state listener with timeout
+  let timeout = null;
+  let authInitialized = false;
+  
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    authInitialized = true;
+    user.value = currentUser;
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+  });
+  
+  // Only show error if auth doesn't initialize within 10 seconds
+  timeout = setTimeout(() => {
+    if (!authInitialized && user.value === undefined) {
       user.value = null;
       toast.error('Không thể kiểm tra trạng thái đăng nhập. Vui lòng thử lại!');
     }
-  }, 5000);
+  }, 10000);
 
-  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    user.value = currentUser;
-    clearTimeout(timeout);
-  });
-
+  // Cleanup
   return () => {
     unsubscribe();
-    clearTimeout(timeout);
+    if (timeout) {
+      clearTimeout(timeout);
+    }
   };
 });
 </script>
