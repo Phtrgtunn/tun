@@ -180,12 +180,12 @@
 
             <!-- Similar Content -->
             <div v-if="similarMovies.length > 0" class="mb-6 border-t border-gray-700 pt-5">
-              <h3 class="text-lg font-bold text-white mb-3">Nội dung tương tự</h3>
-              <div class="grid grid-cols-3 gap-3">
+              <h3 class="text-xl font-bold text-white mb-4">Nội dung tương tự</h3>
+              <div class="grid grid-cols-3 gap-4">
                 <div
                   v-for="(movie, index) in displayedSimilarMovies"
                   :key="movie._id || movie.slug || index"
-                  class="bg-[#2a2a2a] rounded overflow-hidden hover:bg-[#3a3a3a] transition-colors cursor-pointer group"
+                  class="bg-[#2a2a2a] rounded-lg overflow-hidden hover:bg-[#3a3a3a] transition-all duration-300 cursor-pointer group"
                 >
                   <div class="relative aspect-video">
                     <img
@@ -194,22 +194,35 @@
                       class="w-full h-full object-cover"
                       @error="handleImageError"
                     />
-                    <div class="absolute top-2 left-2 flex gap-1">
-                      <span v-if="movie.episode_current" class="px-2 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded">{{ movie.episode_current }}</span>
+                    <!-- Episode Badge -->
+                    <div v-if="movie.episode_current" class="absolute top-3 right-3">
+                      <span class="px-2 py-1 bg-black/80 text-white text-xs font-bold rounded">{{ movie.episode_current }}</span>
                     </div>
-                    <div class="absolute top-2 right-2 flex gap-1">
-                      <span v-if="movie.quality" class="px-2 py-0.5 bg-black/80 text-white text-[10px] rounded">{{ movie.quality }}</span>
-                      <span v-if="movie.year" class="px-2 py-0.5 bg-black/80 text-white text-[10px] rounded">{{ movie.year }}</span>
+                    <!-- Play Button Overlay -->
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-black ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                        </svg>
+                      </div>
                     </div>
-                    <button class="absolute bottom-2 right-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                      </svg>
-                    </button>
                   </div>
-                  <div class="p-2.5">
-                    <p class="text-gray-400 text-xs mb-1">{{ movie.year || '' }}</p>
-                    <p class="text-white text-xs line-clamp-2 leading-relaxed">{{ movie.content?.substring(0, 60) || movie.name }}</p>
+                  <div class="p-3">
+                    <!-- Badges Row -->
+                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                      <span v-if="movie.quality" class="px-2 py-0.5 border border-gray-500 text-gray-300 text-[10px] font-semibold rounded">{{ movie.quality }}</span>
+                      <span v-if="movie.lang" class="px-2 py-0.5 border border-gray-500 text-gray-300 text-[10px] font-semibold rounded">{{ movie.lang }}</span>
+                      <span v-else class="px-2 py-0.5 border border-gray-500 text-gray-300 text-[10px] font-semibold rounded">Vietsub</span>
+                      <span v-if="movie.year" class="text-gray-400 text-[10px]">{{ movie.year }}</span>
+                      <!-- Add Button -->
+                      <button class="ml-auto w-7 h-7 border-2 border-gray-500 hover:border-white rounded-full flex items-center justify-center transition-colors">
+                        <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <!-- Description -->
+                    <p class="text-gray-300 text-sm leading-relaxed line-clamp-3">{{ movie.content?.substring(0, 120) || movie.name }}</p>
                   </div>
                 </div>
               </div>
@@ -218,11 +231,10 @@
               <button
                 v-if="similarMovies.length > 6"
                 @click="toggleShowMore"
-                class="mt-4 w-full py-2 text-white text-sm flex items-center justify-center gap-2 hover:text-gray-300 transition-colors"
+                class="mt-6 mx-auto w-12 h-12 border-2 border-gray-500 hover:border-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
-                <span>{{ showAllSimilar ? 'Thu gọn' : 'Xem thêm' }}</span>
                 <svg
-                  class="w-5 h-5 transition-transform duration-300"
+                  class="w-6 h-6 text-gray-400 transition-transform duration-300"
                   :class="{ 'rotate-180': showAllSimilar }"
                   fill="none"
                   stroke="currentColor"
@@ -231,34 +243,6 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
               </button>
-            </div>
-
-            <!-- About Section -->
-            <div class="border-t border-gray-700 pt-5 mb-6">
-              <h3 class="text-lg font-bold text-white mb-3">Giới thiệu về {{ movieData?.name }}</h3>
-              <div class="space-y-2 text-sm">
-                <div v-if="movieData?.actor && movieData.actor.length">
-                  <span class="text-gray-400">Diễn viên: </span>
-                  <span class="text-white">{{ movieData.actor.join(', ') }}</span>
-                </div>
-                <div v-if="movieData?.category">
-                  <span class="text-gray-400">Thể loại: </span>
-                  <span class="text-white">{{ getCategoryNames(movieData.category) }}</span>
-                </div>
-                <div v-if="movieData?.country">
-                  <span class="text-gray-400">Series này: </span>
-                  <span class="text-white">{{ getCountryNames(movieData.country) }}</span>
-                </div>
-                <div>
-                  <span class="text-gray-400">Xếp hạng độ tuổi: </span>
-                  <span class="px-2 py-0.5 border border-gray-500 text-white text-xs rounded">T18</span>
-                  <span class="text-gray-400"> khoa thần, tự hại, bạo hành tình dục, bạo lực</span>
-                </div>
-                <div v-if="movieData?.director && movieData.director.length">
-                  <span class="text-gray-400">Đạo diễn: </span>
-                  <span class="text-white">{{ movieData.director.join(', ') }}</span>
-                </div>
-              </div>
             </div>
 
             <!-- Comments Section -->
@@ -296,6 +280,34 @@
               <!-- No comments -->
               <div v-else class="mt-6 text-center py-8 bg-[#2a2a2a] rounded-lg">
                 <p class="text-gray-400 text-sm">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+              </div>
+            </div>
+
+            <!-- About Section (Footer) -->
+            <div class="border-t border-gray-700 pt-5 mt-6">
+              <h3 class="text-xl font-bold text-white mb-4">Giới thiệu về {{ movieData?.name }}</h3>
+              <div class="space-y-2 text-sm text-gray-400">
+                <div v-if="movieData?.actor && movieData.actor.length">
+                  <span class="text-gray-500">Diễn viên: </span>
+                  <span class="text-white">{{ movieData.actor.join(', ') }}</span>
+                </div>
+                <div v-if="movieData?.category">
+                  <span class="text-gray-500">Thể loại: </span>
+                  <span class="text-white">{{ getCategoryNames(movieData.category) }}</span>
+                </div>
+                <div v-if="movieData?.country">
+                  <span class="text-gray-500">Series này: </span>
+                  <span class="text-white">{{ getCountryNames(movieData.country) }}</span>
+                </div>
+                <div>
+                  <span class="text-gray-500">Xếp hạng độ tuổi: </span>
+                  <span class="px-2 py-0.5 border border-gray-500 text-white text-xs rounded">T18</span>
+                  <span class="text-gray-400"> khoa thần, tự hại, bạo hành tình dục, bạo lực</span>
+                </div>
+                <div v-if="movieData?.director && movieData.director.length">
+                  <span class="text-gray-500">Đạo diễn: </span>
+                  <span class="text-white">{{ movieData.director.join(', ') }}</span>
+                </div>
               </div>
             </div>
           </div>
