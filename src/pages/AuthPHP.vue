@@ -189,7 +189,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import authService from '@/services/authService';
 import { toast } from 'vue3-toastify';
@@ -214,6 +214,16 @@ const showPassword = ref(false);
 const error = ref('');
 const success = ref('');
 const loading = ref(false);
+
+// Lock body scroll when component mounts
+onMounted(() => {
+  document.body.style.overflow = 'hidden';
+});
+
+// Unlock body scroll when component unmounts
+onUnmounted(() => {
+  document.body.style.overflow = '';
+});
 
 const toggleMode = () => {
   isLogin.value = !isLogin.value;
