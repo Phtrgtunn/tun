@@ -174,7 +174,7 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
-        <div class="p-4 overflow-y-auto max-h-[calc(80vh-80px)]">
+        <div class="p-4 overflow-y-auto max-h-[calc(80vh-80px)] scrollbar-hide">
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <div v-for="(movie, i) in trendingMoviesAll" :key="i" class="group cursor-pointer">
               <div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-2">
@@ -201,7 +201,7 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
-        <div class="p-4 overflow-y-auto max-h-[calc(80vh-80px)]">
+        <div class="p-4 overflow-y-auto max-h-[calc(80vh-80px)] scrollbar-hide">
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <div v-for="(movie, i) in favoriteMoviesAll" :key="i" class="group cursor-pointer">
               <div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-2">
