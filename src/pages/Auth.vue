@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   getAuth,
@@ -118,6 +118,16 @@ const username = ref('');  // Username (used for registration)
 const email = ref('');    // Email input
 const password = ref(''); // Password input
 const error = ref('');    // Error message
+
+// Lock body scroll when component mounts
+onMounted(() => {
+  document.body.style.overflow = 'hidden';
+});
+
+// Unlock body scroll when component unmounts
+onUnmounted(() => {
+  document.body.style.overflow = '';
+});
 const loading = ref(false); // Loading state
 
 // Check if user is already logged in
