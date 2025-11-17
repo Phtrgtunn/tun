@@ -103,6 +103,7 @@
     :is-open="isModalOpen"
     :movie-slug="selectedMovieSlug"
     @close="isModalOpen = false"
+    @open-movie="handleOpenMovie"
   />
 
   <!-- Preview Card Portal -->
@@ -277,6 +278,12 @@ const openMovieDetail = (movie) => {
   } else {
     console.error('❌ No slug found for movie:', movie);
   }
+};
+
+const handleOpenMovie = (slug) => {
+  console.log('🎬 Opening new movie from modal:', slug);
+  selectedMovieSlug.value = slug;
+  isModalOpen.value = true;
 };
 
 const getMovieImage = (movie) => {

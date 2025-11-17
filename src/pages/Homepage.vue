@@ -192,6 +192,7 @@
       :is-open="isModalOpen"
       :movie-slug="selectedMovieSlug"
       @close="isModalOpen = false"
+      @open-movie="handleOpenMovie"
     />
   </div>
 </template>
@@ -234,6 +235,12 @@ const openMovieDetail = (movie) => {
     selectedMovieSlug.value = movie.slug;
     isModalOpen.value = true;
   }
+};
+
+const handleOpenMovie = (slug) => {
+  console.log('🎬 Opening new movie from modal:', slug);
+  selectedMovieSlug.value = slug;
+  isModalOpen.value = true;
 };
 
 const playMovie = (movie) => {

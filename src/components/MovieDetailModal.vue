@@ -185,6 +185,7 @@
                 <div
                   v-for="(movie, index) in displayedSimilarMovies"
                   :key="movie._id || movie.slug || index"
+                  @click="openSimilarMovie(movie)"
                   class="bg-[#2a2a2a] rounded-lg overflow-hidden hover:bg-[#3a3a3a] transition-all duration-300 cursor-pointer group"
                 >
                   <div class="relative aspect-video">
@@ -208,21 +209,38 @@
                     </div>
                   </div>
                   <div class="p-3">
+                    <!-- Movie Title -->
+                    <h4 class="text-white font-bold text-sm mb-2 line-clamp-1">{{ movie.name }}</h4>
+                    
                     <!-- Badges Row -->
                     <div class="flex items-center gap-2 mb-2 flex-wrap">
-                      <span v-if="movie.quality" class="px-2 py-0.5 border border-gray-500 text-gray-300 text-[10px] font-semibold rounded">{{ movie.quality }}</span>
-                      <span v-if="movie.lang" class="px-2 py-0.5 border border-gray-500 text-gray-300 text-[10px] font-semibold rounded">{{ movie.lang }}</span>
-                      <span v-else class="px-2 py-0.5 border border-gray-500 text-gray-300 text-[10px] font-semibold rounded">Vietsub</span>
-                      <span v-if="movie.year" class="text-gray-400 text-[10px]">{{ movie.year }}</span>
+                      <!-- Quality Badge -->
+                      <span v-if="movie.quality" class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] font-bold rounded">{{ movie.quality }}</span>
+                      <span v-else class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] font-bold rounded">HD</span>
+                      
+                      <!-- Language Badge -->
+                      <span v-if="movie.lang" class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded">{{ movie.lang }}</span>
+                      <span v-else class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded">Vietsub</span>
+                      
+                      <!-- Year -->
+                      <span v-if="movie.year" class="px-2 py-0.5 bg-gray-700 text-white text-[10px] font-semibold rounded">{{ movie.year }}</span>
+                      
+                      <!-- Type Badge -->
+                      <span v-if="movie.type === 'series'" class="px-2 py-0.5 bg-purple-600 text-white text-[10px] font-bold rounded">Phim bộ</span>
+                      <span v-else-if="movie.type === 'single'" class="px-2 py-0.5 bg-green-600 text-white text-[10px] font-bold rounded">Phim lẻ</span>
+                      
                       <!-- Add Button -->
-                      <button class="ml-auto w-7 h-7 border-2 border-gray-500 hover:border-white rounded-full flex items-center justify-center transition-colors">
+                      <button 
+                        @click.stop
+                        class="ml-auto w-7 h-7 border-2 border-gray-500 hover:border-white rounded-full flex items-center justify-center transition-colors"
+                      >
                         <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                       </button>
                     </div>
                     <!-- Description -->
-                    <p class="text-gray-300 text-sm leading-relaxed line-clamp-3">{{ movie.content?.substring(0, 120) || movie.name }}</p>
+                    <p class="text-gray-400 text-xs leading-relaxed line-clamp-3">{{ movie.content?.substring(0, 150) || 'Đang cập nhật nội dung...' }}</p>
                   </div>
                 </div>
               </div>
@@ -327,7 +345,7 @@ const props = defineProps({
   movieSlug: String
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'open-movie']);
 
 const movieData = ref(null);
 const episodes = ref([]);
@@ -493,6 +511,18 @@ const formatDate = (dateString) => {
   if (diff < 604800) return `${Math.floor(diff / 86400)} ngày trước`;
   
   return date.toLocaleDateString('vi-VN');
+};
+
+const openSimilarMovie = (movie) => {
+  if (movie?.slug) {
+    console.log('🎬 Opening similar movie:', movie.name);
+    // Close current modal and emit event to parent to open new modal
+    emit('close');
+    // Wait a bit then emit open-movie event
+    setTimeout(() => {
+      emit('open-movie', movie.slug);
+    }, 100);
+  }
 };
 
 watch(() => props.isOpen, (newVal) => {
