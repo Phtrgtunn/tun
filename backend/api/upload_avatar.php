@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once '../config/database.php';
 
+$db = getDBConnection();
+
 try {
     $data = json_decode(file_get_contents('php://input'), true);
     
@@ -43,15 +45,19 @@ try {
         throw new Exception('Failed to save image');
     }
     
-    // Update database
-    $stmt = $pdo->prepare("UPDATE users SET avatar = ? WHERE firebase_uid = ?");
+    // Update database with mysqli
     $avatar_url = 'http://localhost/HTHREE_film/backend/uploads/avatars/' . $filename;
-    $stmt->execute([$avatar_url, $firebase_uid]);
+    $stmt = $db->prepare("UPDATE users SET avatar = ? WHERE firebase_uid = ?");
+    $stmt->bind_param('ss', $avatar_url, $firebase_uid);
+    
+    if (!$stmt->execute()) {
+        throw new Exception('Failed to update database');
+    }
     
     echo json_encode([
         'success' => true,
         'avatar_url' => $avatar_url,
-        'message' => 'Avatar uploaded successfully'
+        'message' => 'Avatar uploaded and saved to database'
     ]);
     
 } catch (Exception $e) {
@@ -61,3 +67,5 @@ try {
         'message' => $e->getMessage()
     ]);
 }
+
+$db->close();
