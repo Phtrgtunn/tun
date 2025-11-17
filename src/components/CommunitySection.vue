@@ -97,6 +97,9 @@
             <h3 class="text-sm font-bold text-white uppercase">SÔI NỔI NHẤT</h3>
           </div>
           <div class="space-y-2 mb-3">
+            <div v-if="trendingMovies.length === 0" class="text-center py-4 text-gray-500 text-xs">
+              Đang tải phim...
+            </div>
             <div v-for="(movie, i) in trendingMovies" :key="i" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-800/50 transition cursor-pointer">
               <span class="text-yellow-400 font-bold text-xs w-5">{{ i + 1 }}</span>
               <img :src="movie.poster" class="w-8 h-11 rounded object-cover" @error="(e) => e.target.src = 'https://placehold.co/32x44/1a1a1a/fff?text=?'" />
@@ -118,6 +121,9 @@
             <h3 class="text-sm font-bold text-white uppercase">YÊU THÍCH NHẤT</h3>
           </div>
           <div class="space-y-2 mb-3">
+            <div v-if="favoriteMovies.length === 0" class="text-center py-4 text-gray-500 text-xs">
+              Đang tải phim...
+            </div>
             <div v-for="(movie, i) in favoriteMovies" :key="i" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-800/50 transition cursor-pointer">
               <span class="text-yellow-400 font-bold text-xs w-5">{{ i + 1 }}</span>
               <img :src="movie.poster" class="w-8 h-11 rounded object-cover" @error="(e) => e.target.src = 'https://placehold.co/32x44/1a1a1a/fff?text=?'" />
@@ -300,8 +306,11 @@ const fetchMoviesFromAPI = async () => {
       });
       favoriteMovies.value = favoriteMoviesAll.value.slice(0, 5);
       
-      console.log('✅ Trending Movies (display 5):', trendingMovies.value.length, '/ Total:', trendingMoviesAll.value.length);
-      console.log('✅ Favorite Movies (display 5):', favoriteMovies.value.length, '/ Total:', favoriteMoviesAll.value.length);
+      console.log('🎬 Total movies from API:', movies.length);
+      console.log('🔥 Trending Movies (display):', trendingMovies.value.length, trendingMovies.value);
+      console.log('🔥 Trending Movies (all):', trendingMoviesAll.value.length);
+      console.log('💛 Favorite Movies (display):', favoriteMovies.value.length, favoriteMovies.value);
+      console.log('💛 Favorite Movies (all):', favoriteMoviesAll.value.length);
       
       console.log('✅ Top Comments:', topComments.value);
       console.log('✅ Trending:', trendingMovies.value);
