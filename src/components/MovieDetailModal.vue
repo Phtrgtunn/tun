@@ -240,7 +240,9 @@
                       </button>
                     </div>
                     <!-- Description -->
-                    <p class="text-gray-400 text-xs leading-relaxed line-clamp-3">{{ movie.content?.substring(0, 150) || 'Đang cập nhật nội dung...' }}</p>
+                    <p class="text-gray-400 text-xs leading-relaxed line-clamp-3">
+                      {{ movie.content || movie.description || movie.origin_name || movie.name }}
+                    </p>
                   </div>
                 </div>
               </div>
