@@ -282,10 +282,10 @@ const fetchMoviesFromAPI = async () => {
         };
       });
       
-      // Lấy tất cả phim cho Trending (hiển thị 5, lưu tất cả)
+      // Lấy phim cho Trending (8-17 = 10 phim, hiển thị 5)
       const trendingStart = 8;
-      const trendingEnd = Math.min(trendingStart + 15, movies.length);
-      trendingMoviesAll.value = movies.slice(trendingStart, trendingEnd).map(movie => {
+      const trendingCount = 10;
+      trendingMoviesAll.value = movies.slice(trendingStart, trendingStart + trendingCount).map(movie => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
         return {
           title: movie.name,
@@ -295,10 +295,10 @@ const fetchMoviesFromAPI = async () => {
       });
       trendingMovies.value = trendingMoviesAll.value.slice(0, 5);
       
-      // Lấy tất cả phim cho Favorites (hiển thị 5, lưu tất cả)
-      const favoriteStart = trendingEnd;
-      const favoriteEnd = Math.min(favoriteStart + 15, movies.length);
-      favoriteMoviesAll.value = movies.slice(favoriteStart, favoriteEnd).map(movie => {
+      // Lấy phim cho Favorites (18-27 = 10 phim, hiển thị 5)
+      const favoriteStart = trendingStart + trendingCount;
+      const favoriteCount = 10;
+      favoriteMoviesAll.value = movies.slice(favoriteStart, favoriteStart + favoriteCount).map(movie => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
         return {
           title: movie.name,
