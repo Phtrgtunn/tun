@@ -329,13 +329,23 @@ const fetchSimilarMovies = async () => {
 };
 
 watch(() => props.isOpen, (newVal) => {
-  if (newVal && props.movieSlug) {
-    fetchMovieDetails();
+  if (newVal) {
+    console.log('🎬 Modal opened with slug:', props.movieSlug);
+    if (props.movieSlug) {
+      fetchMovieDetails();
+    } else {
+      console.error('❌ No movie slug provided!');
+    }
     document.body.style.overflow = 'hidden';
   } else {
     document.body.style.overflow = '';
+    // Reset data when closing
+    movieData.value = null;
+    episodes.value = [];
+    similarMovies.value = [];
+    showAllSimilar.value = false;
   }
-});
+}, { immediate: true });
 </script>
 
 <style scoped>

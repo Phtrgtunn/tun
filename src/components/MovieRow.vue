@@ -268,10 +268,14 @@ let hoverTimer = null;
 let observer = null;
 
 const openMovieDetail = (movie) => {
+  console.log('🎬 Opening movie detail for:', movie);
   if (movie?.slug) {
+    console.log('✅ Movie slug:', movie.slug);
     selectedMovieSlug.value = movie.slug;
     isModalOpen.value = true;
     closePreview(); // Đóng preview card khi mở modal
+  } else {
+    console.error('❌ No slug found for movie:', movie);
   }
 };
 
