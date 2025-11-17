@@ -23,11 +23,11 @@
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </button>
           
-          <div ref="topScrollRef" class="flex gap-3 overflow-x-auto scrollbar-hide py-3 scroll-smooth">
+          <div ref="topScrollRef" class="flex gap-4 overflow-x-auto scrollbar-hide py-4 scroll-smooth">
             <div 
               v-for="(comment, index) in topComments" 
               :key="comment.id" 
-              class="flex-none w-[300px] rounded-xl p-4 border border-gray-700/30 hover:border-yellow-400/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-yellow-400/20 relative overflow-hidden group"
+              class="flex-none w-[300px] rounded-xl p-4 border border-gray-700/30 hover:border-yellow-400/50 transition-all duration-300 cursor-pointer hover:scale-[1.01] hover:shadow-lg hover:shadow-yellow-400/20 relative overflow-hidden group"
             >
               <!-- Background Poster với blur -->
               <div 
