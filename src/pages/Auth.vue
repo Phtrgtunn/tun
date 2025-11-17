@@ -244,3 +244,16 @@ button {
   transition: all 0.3s ease;
 }
 </style>
+
+<sty
+le scoped>
+/* Hide scrollbar for the inner container */
+.overflow-y-auto::-webkit-scrollbar {
+  display: none;
+}
+
+.overflow-y-auto {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

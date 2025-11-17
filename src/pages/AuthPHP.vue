@@ -215,7 +215,7 @@ const error = ref('');
 const success = ref('');
 const loading = ref(false);
 
-// Lock body scroll when component mounts
+// Lock body scroll and hide scrollbar when component mounts
 onMounted(() => {
   document.body.style.overflow = 'hidden';
 });
@@ -330,5 +330,18 @@ const handleGoogleAuth = async () => {
 <style scoped>
 .delay-1000 {
   animation-delay: 1s;
+}
+</style>
+
+
+<style scoped>
+/* Hide scrollbar for the inner container */
+.overflow-y-auto::-webkit-scrollbar {
+  display: none;
+}
+
+.overflow-y-auto {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>
