@@ -137,13 +137,32 @@ const submitComment = async () => {
       uid: user.value.uid
     });
     
+    // Upload avatar to server if user has photoURL from Firebase
+    let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.displayName || user.value.email.split('@')[0])}&background=f59e0b&color=000&size=128`;
+    
+    if (user.value.photoURL) {
+      try {
+        const uploadResponse = await axios.post(`${API_URL}/upload_avatar.php`, {
+          firebase_uid: user.value.uid,
+          photo_url: user.value.photoURL
+        });
+        
+        if (uploadResponse.data.success) {
+          avatarUrl = uploadResponse.data.avatar_url;
+          console.log('✅ Avatar uploaded:', avatarUrl);
+        }
+      } catch (error) {
+        console.log('⚠️ Avatar upload failed, using fallback');
+      }
+    }
+    
     // Register/Get user from database
     const userResponse = await axios.post(`${API_URL}/users.php`, {
       firebase_uid: user.value.uid,
       email: user.value.email,
       username: user.value.email.split('@')[0],
       full_name: user.value.displayName || user.value.email.split('@')[0],
-      avatar: user.value.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.displayName || user.value.email.split('@')[0])}&background=f59e0b&color=000`
+      avatar: avatarUrl
     });
     
     console.log('👤 User response:', userResponse.data);
