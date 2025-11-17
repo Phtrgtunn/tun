@@ -160,12 +160,7 @@ import CommentForm from './CommentForm.vue';
 const API_URL = 'http://localhost/HTHREE_film/backend/api';
 const topScrollRef = ref(null);
 
-const topComments = ref([
-  { id: 1, name: 'N VL', avatar: 'https://ui-avatars.com/api/?name=NVL&background=f59e0b&color=000', text: 'Tập một bức mình nam chính thật sự, trả lời câu hỏi mà cứ ngơ ngơ...', movieTitle: 'Loading...', moviePoster: 'https://placehold.co/64x96/1a1a1a/fff?text=Loading', likes: 1, dislikes: 0, replies: 4 },
-  { id: 2, name: 'Khuong Nguyen', avatar: 'https://ui-avatars.com/api/?name=Khuong&background=3b82f6&color=fff', text: 'Cái bé này thật sự là hay quá, mình đã xem 3 lần rồi mà vẫn thấy hay!', movieTitle: 'Loading...', moviePoster: 'https://placehold.co/64x96/1a1a1a/fff?text=Loading', likes: 5, dislikes: 0, replies: 2 },
-  { id: 3, name: 'Doss Nguyen', avatar: 'https://ui-avatars.com/api/?name=Doss&background=ef4444&color=fff', text: 'Phim hay lắm, diễn xuất tuyệt vời, cảnh quay đẹp mắt!', movieTitle: 'Loading...', moviePoster: 'https://placehold.co/64x96/1a1a1a/fff?text=Loading', likes: 8, dislikes: 1, replies: 6 },
-  { id: 4, name: 'toni_nguyen', avatar: 'https://ui-avatars.com/api/?name=Toni&background=10b981&color=fff', text: 'Anime đỉnh cao! Miku chan kawaii quá đi mất!', movieTitle: 'Loading...', moviePoster: 'https://placehold.co/64x96/1a1a1a/fff?text=Loading', likes: 12, dislikes: 0, replies: 8 }
-]);
+const topComments = ref([]);
 
 const trendingMovies = ref([]);
 const favoriteMovies = ref([]);
@@ -191,10 +186,29 @@ const fetchMoviesFromAPI = async () => {
     if (response.data?.items?.length) {
       const movies = response.data.items.slice(0, 10);
       
-      // Lấy 3 phim đầu cho Trending
-      trendingMovies.value = movies.slice(0, 3).map(movie => {
+      // Update Top Comments với 4 phim đầu
+      const sampleComments = [
+        { name: 'N VL', avatar: 'https://ui-avatars.com/api/?name=NVL&background=f59e0b&color=000', text: 'Tập một bức mình nam chính thật sự, trả lời câu hỏi mà cứ ngơ ngơ...', likes: 1, dislikes: 0, replies: 4 },
+        { name: 'Khuong Nguyen', avatar: 'https://ui-avatars.com/api/?name=Khuong&background=3b82f6&color=fff', text: 'Cái bé này thật sự là hay quá, mình đã xem 3 lần rồi mà vẫn thấy hay!', likes: 5, dislikes: 0, replies: 2 },
+        { name: 'Doss Nguyen', avatar: 'https://ui-avatars.com/api/?name=Doss&background=ef4444&color=fff', text: 'Phim hay lắm, diễn xuất tuyệt vời, cảnh quay đẹp mắt!', likes: 8, dislikes: 1, replies: 6 },
+        { name: 'toni_nguyen', avatar: 'https://ui-avatars.com/api/?name=Toni&background=10b981&color=fff', text: 'Anime đỉnh cao! Miku chan kawaii quá đi mất!', likes: 12, dislikes: 0, replies: 8 }
+      ];
+      
+      topComments.value = movies.slice(0, 4).map((movie, index) => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
-        console.log('📸 Movie:', movie.name, 'Poster:', posterUrl);
+        const fullPosterUrl = posterUrl.startsWith('http') ? posterUrl : `https://img.phimapi.com/${posterUrl}`;
+        
+        return {
+          id: index + 1,
+          ...sampleComments[index],
+          movieTitle: movie.name,
+          moviePoster: fullPosterUrl
+        };
+      });
+      
+      // Lấy 3 phim tiếp cho Trending
+      trendingMovies.value = movies.slice(4, 7).map(movie => {
+        const posterUrl = movie.poster_url || movie.thumb_url || '';
         return {
           title: movie.name,
           year: movie.year || 2024,
@@ -202,8 +216,8 @@ const fetchMoviesFromAPI = async () => {
         };
       });
       
-      // Lấy 3 phim tiếp theo cho Favorites
-      favoriteMovies.value = movies.slice(3, 6).map(movie => {
+      // Lấy 3 phim tiếp cho Favorites
+      favoriteMovies.value = movies.slice(7, 10).map(movie => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
         return {
           title: movie.name,
@@ -212,6 +226,7 @@ const fetchMoviesFromAPI = async () => {
         };
       });
       
+      console.log('✅ Top Comments:', topComments.value);
       console.log('✅ Trending:', trendingMovies.value);
       console.log('✅ Favorites:', favoriteMovies.value);
     }
