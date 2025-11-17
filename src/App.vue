@@ -73,27 +73,7 @@ onMounted(() => {
     setToastInstance(toastRef.value);
   }
   
-  // Enable browser scroll restoration
-  if ('scrollRestoration' in history) {
-    history.scrollRestoration = 'manual';
-  }
-  
-  // Restore scroll position from localStorage
-  const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-  if (savedScrollPosition) {
-    setTimeout(() => {
-      window.scrollTo(0, parseInt(savedScrollPosition));
-      sessionStorage.removeItem('scrollPosition');
-    }, 100);
-  }
-  
-  // Save scroll position before page unload
-  const saveScrollPosition = () => {
-    sessionStorage.setItem('scrollPosition', window.scrollY.toString());
-  };
-  
-  window.addEventListener('beforeunload', saveScrollPosition);
-  
+
   // Auth state listener with timeout
   let timeout = null;
   let authInitialized = false;
@@ -118,7 +98,6 @@ onMounted(() => {
   // Cleanup
   return () => {
     unsubscribe();
-    window.removeEventListener('beforeunload', saveScrollPosition);
     if (timeout) {
       clearTimeout(timeout);
     }
