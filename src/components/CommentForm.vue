@@ -8,12 +8,13 @@
     <!-- User info -->
     <div v-if="user" class="flex items-center gap-3 mb-4">
       <img 
-        :src="user.photoURL || user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.username || 'User')}&background=f59e0b&color=000`"
-        :alt="user.displayName || user.username"
-        class="w-10 h-10 rounded-full border-2 border-yellow-400"
+        :src="getUserAvatar()"
+        :alt="user.displayName || user.email"
+        class="w-10 h-10 rounded-full border-2 border-yellow-400 object-cover"
+        @error="handleAvatarError"
       />
       <div>
-        <p class="text-white font-medium text-sm">{{ user.displayName || user.username }}</p>
+        <p class="text-white font-medium text-sm">{{ user.displayName || user.email?.split('@')[0] }}</p>
         <p class="text-gray-400 text-xs">{{ user.email }}</p>
       </div>
     </div>
@@ -91,8 +92,29 @@ const user = computed(() => auth.currentUser);
 const commentText = ref('');
 const isSubmitting = ref(false);
 const showSuccess = ref(false);
+const avatarError = ref(false);
 
 const API_URL = 'http://localhost/HTHREE_film/backend/api';
+
+const getUserAvatar = () => {
+  if (avatarError.value || !user.value) {
+    const name = user.value?.displayName || user.value?.email?.split('@')[0] || 'User';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f59e0b&color=000&size=128`;
+  }
+  
+  if (user.value.photoURL) {
+    return user.value.photoURL;
+  }
+  
+  const name = user.value.displayName || user.value.email?.split('@')[0] || 'User';
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f59e0b&color=000&size=128`;
+};
+
+const handleAvatarError = (event) => {
+  avatarError.value = true;
+  const name = user.value?.displayName || user.value?.email?.split('@')[0] || 'User';
+  event.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f59e0b&color=000&size=128`;
+};
 
 const handleEnterKey = (event) => {
   // Nếu chỉ nhấn Enter (không có Shift) thì gửi comment
