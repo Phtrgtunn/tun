@@ -134,11 +134,14 @@ const submitComment = async () => {
     console.log('🚀 Submitting comment...', {
       email: user.value.email,
       displayName: user.value.displayName,
-      uid: user.value.uid
+      uid: user.value.uid,
+      photoURL: user.value.photoURL
     });
     
     // Upload avatar to server if user has photoURL from Firebase
     let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value.displayName || user.value.email.split('@')[0])}&background=f59e0b&color=000&size=128`;
+    
+    console.log('📸 Checking photoURL:', user.value.photoURL);
     
     if (user.value.photoURL) {
       try {

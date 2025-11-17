@@ -363,7 +363,14 @@ const loadCommunityData = async () => {
             text: c.content
           };
         });
-        console.log('✅ Updated recent comments:', recentComments.value);
+        console.log('✅ Updated recent comments:', recentComments.value.length);
+        recentComments.value.forEach((c, i) => {
+          console.log(`Comment ${i + 1}:`, {
+            name: c.name,
+            avatar: c.avatar,
+            text: c.text.substring(0, 30)
+          });
+        });
       }
     }
   } catch (error) {
