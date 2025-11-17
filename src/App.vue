@@ -42,9 +42,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-4 text-center">
-      <p class="text-sm">© 2025 - Ứng dụng xem phim. All rights reserved.</p>
-    </footer>
+    <FooterComponent />
   </div>
   
   <!-- Custom Toast -->
@@ -58,6 +56,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Navbar from '@/components/NetflixNavbar.vue';
 import SplashScreen from '@/components/SplashScreen.vue';
 import CustomToast from '@/components/CustomToast.vue';
+import FooterComponent from '@/components/FooterComponent.vue';
 import { setToastInstance, useToast } from '@/composables/useToast';
 
 const route = useRoute();
