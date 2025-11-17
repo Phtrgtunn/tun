@@ -479,7 +479,7 @@ const fetchSimilarMovies = async () => {
     
     console.log('✅ Similar movies loaded:', movies.length);
     
-    // Fetch details for each movie to get content
+    // Fetch details for each movie to get content and better images
     const moviesWithDetails = await Promise.all(
       movies.map(async (movie) => {
         try {
@@ -489,7 +489,10 @@ const fetchSimilarMovies = async () => {
             return {
               ...movie,
               content: detailData.movie.content || movie.content,
-              description: detailData.movie.description || movie.description
+              description: detailData.movie.description || movie.description,
+              // Use thumb_url from detail API (should be horizontal)
+              thumb_url: detailData.movie.thumb_url || movie.thumb_url,
+              poster_url: detailData.movie.poster_url || movie.poster_url
             };
           }
           return movie;
@@ -502,6 +505,8 @@ const fetchSimilarMovies = async () => {
     
     similarMovies.value = moviesWithDetails;
     console.log('✅ Similar movies with details loaded:', similarMovies.value.length);
+    console.log('✅ First movie thumb_url:', moviesWithDetails[0]?.thumb_url);
+    console.log('✅ First movie poster_url:', moviesWithDetails[0]?.poster_url);
     
   } catch (error) {
     console.error('❌ Error fetching similar movies:', error);
