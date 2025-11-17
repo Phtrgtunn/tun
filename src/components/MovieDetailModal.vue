@@ -286,14 +286,28 @@ const fetchMovieDetails = async () => {
     const data = await response.json();
     
     console.log('📦 API Response:', data);
+    console.log('📦 Response status:', data.status);
+    console.log('📦 Response movie:', data.movie);
     
+    // Check multiple possible response structures
     if (data.status === 'success' && data.movie) {
       movieData.value = data.movie;
       episodes.value = data.episodes?.[0]?.server_data || [];
       console.log('✅ Movie data loaded:', movieData.value.name);
       console.log('📺 Episodes:', episodes.value.length);
+    } else if (data.status === true && data.movie) {
+      // Alternative status format
+      movieData.value = data.movie;
+      episodes.value = data.episodes?.[0]?.server_data || [];
+      console.log('✅ Movie data loaded (alt):', movieData.value.name);
+    } else if (data.movie) {
+      // No status field
+      movieData.value = data.movie;
+      episodes.value = data.episodes?.[0]?.server_data || [];
+      console.log('✅ Movie data loaded (no status):', movieData.value.name);
     } else {
       console.error('❌ Invalid API response:', data);
+      console.error('❌ Available keys:', Object.keys(data));
     }
     
     // Fetch similar movies
