@@ -163,8 +163,9 @@
     </div>
 
     <!-- Modal Sôi Nổi Nhất -->
-    <div v-if="showTrendingModal" @click="showTrendingModal = false" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div @click.stop class="bg-gray-900 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden border border-gray-800">
+    <Transition name="modal">
+      <div v-if="showTrendingModal" @click="showTrendingModal = false" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div @click.stop class="bg-gray-900 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden border border-gray-800 modal-content">
         <div class="flex items-center justify-between p-4 border-b border-gray-800">
           <div class="flex items-center gap-2">
             <span class="text-2xl">🔥</span>
@@ -186,12 +187,14 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </Transition>
 
     <!-- Modal Yêu Thích Nhất -->
-    <div v-if="showFavoriteModal" @click="showFavoriteModal = false" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div @click.stop class="bg-gray-900 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden border border-gray-800">
+    <Transition name="modal">
+      <div v-if="showFavoriteModal" @click="showFavoriteModal = false" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div @click.stop class="bg-gray-900 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden border border-gray-800 modal-content">
         <div class="flex items-center justify-between p-4 border-b border-gray-800">
           <div class="flex items-center gap-2">
             <span class="text-2xl">💛</span>
@@ -213,8 +216,9 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
@@ -359,4 +363,61 @@ onMounted(() => {
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Modal animations */
+.modal-enter-active {
+  animation: modal-fade-in 0.3s ease-out;
+}
+
+.modal-leave-active {
+  animation: modal-fade-out 0.25s ease-in;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.modal-enter-active .modal-content {
+  animation: modal-slide-up 0.3s ease-out;
+}
+
+.modal-leave-active .modal-content {
+  animation: modal-slide-down 0.25s ease-in;
+}
+
+@keyframes modal-slide-up {
+  from {
+    transform: translateY(50px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes modal-slide-down {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(30px) scale(0.98);
+    opacity: 0;
+  }
+}
 </style>
