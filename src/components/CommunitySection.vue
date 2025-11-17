@@ -184,17 +184,21 @@ const fetchMoviesFromAPI = async () => {
     console.log('🎬 API Response:', response.data);
     
     if (response.data?.items?.length) {
-      const movies = response.data.items.slice(0, 10);
+      const movies = response.data.items.slice(0, 20);
       
-      // Update Top Comments với 4 phim đầu
+      // Update Top Comments với 8 phim đầu
       const sampleComments = [
         { name: 'N VL', avatar: 'https://ui-avatars.com/api/?name=NVL&background=f59e0b&color=000', text: 'Tập một bức mình nam chính thật sự, trả lời câu hỏi mà cứ ngơ ngơ...', likes: 1, dislikes: 0, replies: 4 },
         { name: 'Khuong Nguyen', avatar: 'https://ui-avatars.com/api/?name=Khuong&background=3b82f6&color=fff', text: 'Cái bé này thật sự là hay quá, mình đã xem 3 lần rồi mà vẫn thấy hay!', likes: 5, dislikes: 0, replies: 2 },
         { name: 'Doss Nguyen', avatar: 'https://ui-avatars.com/api/?name=Doss&background=ef4444&color=fff', text: 'Phim hay lắm, diễn xuất tuyệt vời, cảnh quay đẹp mắt!', likes: 8, dislikes: 1, replies: 6 },
-        { name: 'toni_nguyen', avatar: 'https://ui-avatars.com/api/?name=Toni&background=10b981&color=fff', text: 'Anime đỉnh cao! Miku chan kawaii quá đi mất!', likes: 12, dislikes: 0, replies: 8 }
+        { name: 'toni_nguyen', avatar: 'https://ui-avatars.com/api/?name=Toni&background=10b981&color=fff', text: 'Anime đỉnh cao! Miku chan kawaii quá đi mất!', likes: 12, dislikes: 0, replies: 8 },
+        { name: 'Mai Anh', avatar: 'https://ui-avatars.com/api/?name=Mai&background=ec4899&color=fff', text: 'Cảm động quá! Tôi đã khóc khi xem phần cuối...', likes: 15, dislikes: 0, replies: 10 },
+        { name: 'Hoang Tuan', avatar: 'https://ui-avatars.com/api/?name=Hoang&background=8b5cf6&color=fff', text: 'CGI đỉnh cao, xứng đáng 5 sao! Recommend mọi người xem', likes: 20, dislikes: 2, replies: 12 },
+        { name: 'Linh Chi', avatar: 'https://ui-avatars.com/api/?name=Linh&background=14b8a6&color=fff', text: 'Phim hay nhưng hơi dài, nên chia làm 2 phần xem cho đỡ mệt', likes: 7, dislikes: 1, replies: 5 },
+        { name: 'Minh Khoa', avatar: 'https://ui-avatars.com/api/?name=Minh&background=f97316&color=fff', text: 'Đạo diễn tài năng thật! Mỗi cảnh quay đều ý nghĩa', likes: 18, dislikes: 0, replies: 9 }
       ];
       
-      topComments.value = movies.slice(0, 4).map((movie, index) => {
+      topComments.value = movies.slice(0, 8).map((movie, index) => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
         const fullPosterUrl = posterUrl.startsWith('http') ? posterUrl : `https://img.phimapi.com/${posterUrl}`;
         
@@ -207,7 +211,7 @@ const fetchMoviesFromAPI = async () => {
       });
       
       // Lấy 3 phim tiếp cho Trending
-      trendingMovies.value = movies.slice(4, 7).map(movie => {
+      trendingMovies.value = movies.slice(8, 11).map(movie => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
         return {
           title: movie.name,
@@ -217,7 +221,7 @@ const fetchMoviesFromAPI = async () => {
       });
       
       // Lấy 3 phim tiếp cho Favorites
-      favoriteMovies.value = movies.slice(7, 10).map(movie => {
+      favoriteMovies.value = movies.slice(11, 14).map(movie => {
         const posterUrl = movie.poster_url || movie.thumb_url || '';
         return {
           title: movie.name,
