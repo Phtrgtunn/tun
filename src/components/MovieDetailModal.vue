@@ -242,19 +242,12 @@
                     
                     <!-- Description with ellipsis -->
                     <p class="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-2">
-                      {{ movie.content || movie.description || movie.origin_name || 'Một bộ phim hấp dẫn đang chờ bạn khám phá. Hãy xem ngay để biết thêm chi tiết về cốt truyện và dàn diễn viên.' }}
+                      {{ movie.content || movie.description || 'Một bộ phim hấp dẫn đang chờ bạn khám phá. Hãy xem ngay để biết thêm chi tiết về cốt truyện và dàn diễn viên.' }}
                     </p>
                     
-                    <!-- Bottom Info: Genres and Country -->
-                    <div class="flex items-center justify-between text-[10px] text-gray-500">
-                      <!-- Genres -->
-                      <div v-if="movie.category && movie.category.length" class="flex items-center gap-1">
-                        <span>{{ movie.category.slice(0, 2).map(c => c.name).join(' • ') }}</span>
-                      </div>
-                      <!-- Country -->
-                      <div v-if="movie.country && movie.country.length" class="flex items-center gap-1">
-                        <span>{{ movie.country[0].name }}</span>
-                      </div>
+                    <!-- Bottom Info: Origin Name -->
+                    <div class="flex items-center justify-between text-xs">
+                      <span v-if="movie.origin_name" class="text-gray-500 italic line-clamp-1">{{ movie.origin_name }}</span>
                     </div>
                   </div>
                 </div>
