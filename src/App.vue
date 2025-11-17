@@ -46,6 +46,9 @@
       <p class="text-sm">© 2025 - Ứng dụng xem phim. All rights reserved.</p>
     </footer>
   </div>
+  
+  <!-- Custom Toast -->
+  <CustomToast ref="toastRef" />
 </template>
 
 <script setup>
@@ -54,13 +57,23 @@ import { useRoute } from 'vue-router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Navbar from '@/components/NetflixNavbar.vue';
 import SplashScreen from '@/components/SplashScreen.vue';
-import { toast } from 'vue3-toastify';
+import CustomToast from '@/components/CustomToast.vue';
+import { setToastInstance, useToast } from '@/composables/useToast';
 
 const route = useRoute();
 const user = ref(undefined);
 const auth = getAuth();
+const toastRef = ref(null);
+const toast = useToast();
 
 const isHomepage = computed(() => route.path === '/home');
+
+// Set toast instance
+onMounted(() => {
+  if (toastRef.value) {
+    setToastInstance(toastRef.value);
+  }
+});
 
 onMounted(() => {
   const timeout = setTimeout(() => {

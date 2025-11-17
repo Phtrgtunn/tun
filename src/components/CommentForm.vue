@@ -72,7 +72,9 @@
 import { ref, computed } from 'vue';
 import { getAuth } from 'firebase/auth';
 import axios from 'axios';
-import { toast } from 'vue3-toastify';
+import { useToast } from '@/composables/useToast';
+
+const toast = useToast();
 
 const props = defineProps({
   movieSlug: {
