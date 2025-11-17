@@ -429,24 +429,34 @@ const fetchMovieDetails = async () => {
 
 const fetchSimilarMovies = async () => {
   try {
+    console.log('🎞️ Fetching similar movies...');
     const response = await fetch('https://phimapi.com/danh-sach/phim-moi-cap-nhat?page=1');
     const data = await response.json();
     
     console.log('🎞️ Similar movies response:', data);
+    console.log('🎞️ Response status:', data.status);
+    console.log('🎞️ Response items:', data.items?.length);
+    console.log('🎞️ Response data.items:', data.data?.items?.length);
     
     if (data.status === 'success' && data.items) {
       // Get 12 random movies
       const shuffled = data.items.sort(() => 0.5 - Math.random());
       similarMovies.value = shuffled.slice(0, 12);
-      console.log('✅ Similar movies loaded:', similarMovies.value.length);
+      console.log('✅ Similar movies loaded (success):', similarMovies.value.length);
+      console.log('✅ First movie:', similarMovies.value[0]);
     } else if (data.data?.items) {
       // Alternative API structure
       const shuffled = data.data.items.sort(() => 0.5 - Math.random());
       similarMovies.value = shuffled.slice(0, 12);
       console.log('✅ Similar movies loaded (alt):', similarMovies.value.length);
+    } else {
+      console.error('❌ No items found in response');
+      console.error('❌ Available keys:', Object.keys(data));
+      similarMovies.value = [];
     }
   } catch (error) {
     console.error('❌ Error fetching similar movies:', error);
+    similarMovies.value = [];
   }
 };
 
