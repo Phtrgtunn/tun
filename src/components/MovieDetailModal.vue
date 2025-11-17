@@ -395,7 +395,18 @@ const getYoutubeEmbedUrl = (url) => {
   if (!url) return '';
   const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
   const muteParam = isMuted.value ? '1' : '0';
-  return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&controls=0&showinfo=0&rel=0&enablejsapi=1&origin=${window.location.origin}` : url;
+  // Parameters to hide YouTube branding and controls:
+  // autoplay=1 - auto play video
+  // mute - mute/unmute based on state
+  // controls=0 - hide player controls
+  // showinfo=0 - hide title (deprecated but still works sometimes)
+  // modestbranding=1 - hide YouTube logo
+  // rel=0 - don't show related videos
+  // iv_load_policy=3 - hide video annotations
+  // disablekb=1 - disable keyboard controls
+  // fs=0 - hide fullscreen button
+  // enablejsapi=1 - enable JavaScript API
+  return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&controls=0&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin=${window.location.origin}` : url;
 };
 
 const toggleMute = () => {
