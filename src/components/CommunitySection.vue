@@ -186,24 +186,34 @@ const fetchMoviesFromAPI = async () => {
       params: { page: 1 }
     });
     
+    console.log('🎬 API Response:', response.data);
+    
     if (response.data?.items?.length) {
       const movies = response.data.items.slice(0, 10);
       
       // Lấy 3 phim đầu cho Trending
-      trendingMovies.value = movies.slice(0, 3).map(movie => ({
-        title: movie.name,
-        year: movie.year || 2024,
-        poster: `https://img.phimapi.com/${movie.poster_url}` // Poster dọc
-      }));
+      trendingMovies.value = movies.slice(0, 3).map(movie => {
+        const posterUrl = movie.poster_url || movie.thumb_url || '';
+        console.log('📸 Movie:', movie.name, 'Poster:', posterUrl);
+        return {
+          title: movie.name,
+          year: movie.year || 2024,
+          poster: posterUrl.startsWith('http') ? posterUrl : `https://img.phimapi.com/${posterUrl}`
+        };
+      });
       
       // Lấy 3 phim tiếp theo cho Favorites
-      favoriteMovies.value = movies.slice(3, 6).map(movie => ({
-        title: movie.name,
-        year: movie.year || 2024,
-        poster: `https://img.phimapi.com/${movie.poster_url}` // Poster dọc
-      }));
+      favoriteMovies.value = movies.slice(3, 6).map(movie => {
+        const posterUrl = movie.poster_url || movie.thumb_url || '';
+        return {
+          title: movie.name,
+          year: movie.year || 2024,
+          poster: posterUrl.startsWith('http') ? posterUrl : `https://img.phimapi.com/${posterUrl}`
+        };
+      });
       
-      console.log('🎬 Loaded movies with vertical posters');
+      console.log('✅ Trending:', trendingMovies.value);
+      console.log('✅ Favorites:', favoriteMovies.value);
     }
   } catch (error) {
     console.log('⚠️ Could not load movies:', error.message);
