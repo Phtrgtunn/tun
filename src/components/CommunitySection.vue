@@ -347,14 +347,23 @@ const loadCommunityData = async () => {
       
       // Update recent comments
       if (data.recent_comments?.length) {
-        recentComments.value = data.recent_comments.map(c => ({
-          id: c.id,
-          name: c.full_name || c.username,
-          avatar: c.avatar,
-          time: c.time_ago,
-          text: c.content
-        }));
-        console.log('✅ Updated recent comments:', recentComments.value.length);
+        recentComments.value = data.recent_comments.map(c => {
+          // Ensure avatar is valid, fallback to UI Avatars if needed
+          let avatar = c.avatar;
+          if (!avatar || avatar.includes('ui-avatars.com')) {
+            const name = c.full_name || c.username || 'User';
+            avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f59e0b&color=000&size=128`;
+          }
+          
+          return {
+            id: c.id,
+            name: c.full_name || c.username,
+            avatar: avatar,
+            time: c.time_ago,
+            text: c.content
+          };
+        });
+        console.log('✅ Updated recent comments:', recentComments.value);
       }
     }
   } catch (error) {

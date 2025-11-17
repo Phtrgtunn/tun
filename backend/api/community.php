@@ -22,9 +22,9 @@ try {
             LIMIT 5";
     $result = $db->query($sql);
     while ($row = $result->fetch_assoc()) {
-        if (empty($row['avatar'])) {
+        if (empty($row['avatar']) || strpos($row['avatar'], 'ui-avatars.com') !== false) {
             $name = urlencode($row['full_name'] ?? $row['username']);
-            $row['avatar'] = "https://ui-avatars.com/api/?name={$name}&background=f59e0b&color=000";
+            $row['avatar'] = "https://ui-avatars.com/api/?name={$name}&background=f59e0b&color=000&size=128";
         }
         $topCommenters[] = $row;
     }
@@ -52,9 +52,9 @@ try {
             LIMIT 5";
     $result = $db->query($sql);
     while ($row = $result->fetch_assoc()) {
-        if (empty($row['avatar'])) {
+        if (empty($row['avatar']) || strpos($row['avatar'], 'ui-avatars.com') !== false) {
             $name = urlencode($row['full_name'] ?? $row['username']);
-            $row['avatar'] = "https://ui-avatars.com/api/?name={$name}&background=f59e0b&color=000";
+            $row['avatar'] = "https://ui-avatars.com/api/?name={$name}&background=f59e0b&color=000&size=128";
         }
         $row['time_ago'] = timeAgo($row['created_at']);
         $recentComments[] = $row;
