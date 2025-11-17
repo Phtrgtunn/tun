@@ -13,12 +13,23 @@
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
         <div class="text-white w-full">
           <p class="text-sm line-clamp-2 mb-2">{{ movie.description || 'Chưa có mô tả' }}</p>
-          <button class="btn btn-primary btn-sm w-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-            </svg>
-            Xem ngay
-          </button>
+          <div class="flex gap-2">
+            <button class="btn btn-primary btn-sm flex-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
+              </svg>
+              Xem ngay
+            </button>
+            <button
+              @click="openModal"
+              class="btn btn-circle btn-sm bg-gray-800 hover:bg-gray-700 border-gray-600"
+              title="Các tập & Thông tin"
+            >
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </figure>
@@ -44,13 +55,29 @@
       </div>
     </div>
   </div>
+
+  <!-- Movie Detail Modal -->
+  <MovieDetailModal
+    :is-open="isModalOpen"
+    :movie-slug="movie.slug"
+    @close="isModalOpen = false"
+  />
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import MovieDetailModal from './MovieDetailModal.vue';
+
 defineProps({
   movie: {
     type: Object,
     required: true
   }
 });
+
+const isModalOpen = ref(false);
+
+const openModal = () => {
+  isModalOpen.value = true;
+};
 </script>

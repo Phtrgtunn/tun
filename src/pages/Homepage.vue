@@ -108,11 +108,12 @@
                 </svg>
               </button>
               <button 
-                @click="playMovie(movie)"
+                @click="openMovieDetail(movie)"
                 class="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 py-3.5 rounded-full font-bold text-base hover:bg-white/30 transition-all border border-white/30"
+                title="Các tập & Thông tin"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
               </button>
             </div>
@@ -185,6 +186,13 @@
 
     <!-- Community Section -->
     <CommunitySection />
+
+    <!-- Movie Detail Modal -->
+    <MovieDetailModal
+      :is-open="isModalOpen"
+      :movie-slug="selectedMovieSlug"
+      @close="isModalOpen = false"
+    />
   </div>
 </template>
 
@@ -196,6 +204,7 @@ import { toast } from 'vue3-toastify';
 import MovieRow from '@/components/MovieRow.vue';
 import CommunitySection from '@/components/CommunitySection.vue';
 import FeaturedCarousel from '@/components/FeaturedCarousel.vue';
+import MovieDetailModal from '@/components/MovieDetailModal.vue';
 
 const router = useRouter();
 
@@ -215,8 +224,17 @@ const heroBannerRef = ref(null);
 let touchStartX = 0;
 let touchEndX = 0;
 let isScrolling = false;
+const isModalOpen = ref(false);
+const selectedMovieSlug = ref('');
 
 const featuredMovie = computed(() => featuredMovies.value[currentBannerIndex.value] || null);
+
+const openMovieDetail = (movie) => {
+  if (movie?.slug) {
+    selectedMovieSlug.value = movie.slug;
+    isModalOpen.value = true;
+  }
+};
 
 const playMovie = (movie) => {
   if (movie?.slug) {
