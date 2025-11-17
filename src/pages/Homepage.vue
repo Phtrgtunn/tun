@@ -135,13 +135,10 @@
     </div>
 
     <!-- Movie Sections -->
+    <!-- Featured Carousel -->
+    <FeaturedCarousel />
+
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-10 relative z-20">
-      <!-- Phim Đề Cử -->
-      <MovieRow 
-        v-if="recommendedMovies?.length"
-        title="🔥 Phim Đề Cử" 
-        :movies="recommendedMovies"
-      />
 
       <!-- Phim Mới Cập Nhật -->
       <MovieRow 
@@ -198,6 +195,7 @@ import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import MovieRow from '@/components/MovieRow.vue';
 import CommunitySection from '@/components/CommunitySection.vue';
+import FeaturedCarousel from '@/components/FeaturedCarousel.vue';
 
 const router = useRouter();
 
