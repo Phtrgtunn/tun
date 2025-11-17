@@ -223,7 +223,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import CommentForm from './CommentForm.vue';
 
@@ -247,6 +247,15 @@ const recentComments = ref([
 
 const scrollTopLeft = () => topScrollRef.value?.scrollBy({ left: -280, behavior: 'smooth' });
 const scrollTopRight = () => topScrollRef.value?.scrollBy({ left: 280, behavior: 'smooth' });
+
+// Lock/unlock body scroll when modal opens/closes
+watch([showTrendingModal, showFavoriteModal], ([trending, favorite]) => {
+  if (trending || favorite) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+});
 
 const fetchMoviesFromAPI = async () => {
   try {
