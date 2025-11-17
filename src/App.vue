@@ -117,29 +117,15 @@ body {
   padding-top: 0;
 }
 
-/* Custom Scrollbar */
+/* Hide Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #000000;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+  display: none;
 }
 
 /* Firefox scrollbar */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: #333333 #000000;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* Page transition animations */
