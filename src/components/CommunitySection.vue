@@ -246,15 +246,17 @@ const scrollTopRight = () => topScrollRef.value?.scrollBy({ left: 280, behavior:
 
 const fetchMoviesFromAPI = async () => {
   try {
-    // Fetch phim mới từ API
-    const response = await axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat', {
-      params: { page: 1 }
-    });
+    // Fetch nhiều phim hơn từ 2 pages
+    const [page1, page2] = await Promise.all([
+      axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat', { params: { page: 1 } }),
+      axios.get('https://phimapi.com/danh-sach/phim-moi-cap-nhat', { params: { page: 2 } })
+    ]);
     
-    console.log('🎬 API Response:', response.data);
+    const allMovies = [...(page1.data?.items || []), ...(page2.data?.items || [])];
+    console.log('🎬 API Response - Total movies:', allMovies.length);
     
-    if (response.data?.items?.length) {
-      const movies = response.data.items.slice(0, 30);
+    if (allMovies.length > 0) {
+      const movies = allMovies;
       
       // Update Top Comments với 8 phim đầu
       const sampleComments = [
