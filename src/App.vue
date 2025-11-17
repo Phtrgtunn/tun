@@ -38,7 +38,14 @@
 
     <!-- Nội dung chính -->
     <main v-else class="flex-grow">
-      <router-view />
+      <router-view v-slot="{ Component, route }">
+        <transition
+          :name="route.meta.transition || 'fade'"
+          mode="out-in"
+        >
+          <component :is="Component" :key="route.path" />
+        </transition>
+      </router-view>
     </main>
 
     <!-- Footer -->
@@ -108,5 +115,51 @@ onMounted(() => {
 <style>
 body {
   padding-top: 0;
+}
+
+/* Page transition animations */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 </style>
