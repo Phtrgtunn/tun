@@ -238,9 +238,78 @@
 
             <!-- Tư cách thành viên -->
             <div v-if="activeSection === 'membership'">
-              <h1 class="text-3xl font-bold text-white mb-8 tracking-tight">Tư cách thành viên</h1>
+              <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Tư cách thành viên</h1>
+              <p class="text-gray-400 mb-8">Thông tin gói dịch vụ</p>
+
+              <!-- Gói Cao cấp -->
+              <div class="bg-gradient-to-r from-purple-900 to-indigo-900 border border-purple-700 rounded-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-white mb-2">Gói Cao cấp</h2>
+                <p class="text-gray-200 mb-4">Độ phân giải video 4K với âm thanh không gian, không quảng cáo khi xem và hơn thế nữa.</p>
+                
+                <!-- Thay đổi gói dịch vụ -->
+                <button class="w-full bg-white/10 hover:bg-white/20 border border-white/30 rounded-lg p-4 transition-all flex items-center justify-between group mt-4">
+                  <span class="text-white font-medium">Thay đổi gói dịch vụ</span>
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+
+                <!-- Mua thêm một suất thành viên bổ sung -->
+                <button class="w-full bg-white/10 hover:bg-white/20 border border-white/30 rounded-lg p-4 transition-all flex items-center justify-between group mt-3">
+                  <div class="text-left flex-1">
+                    <p class="text-white font-medium">Mua thêm một suất thành viên bổ sung</p>
+                    <p class="text-gray-300 text-sm">Chia sẻ HTHREE với người không sống cùng bạn.</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">Mới</span>
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Thông tin thanh toán -->
+              <div class="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-white mb-4">Thông tin thanh toán</h3>
+                
+                <!-- Lần thanh toán tiếp theo -->
+                <div class="mb-6">
+                  <h4 class="text-white font-semibold mb-2">Lần thanh toán tiếp theo</h4>
+                  <p class="text-gray-300">{{ getNextPaymentDate() }}</p>
+                  <p class="text-gray-400 text-sm">Ghi nợ trực tiếp: {{ user.email }}</p>
+                </div>
+
+                <!-- Quản lý phương thức thanh toán -->
+                <button class="w-full bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-gray-700 rounded-lg p-4 transition-all flex items-center justify-between group mb-3">
+                  <span class="text-white font-medium">Quản lý phương thức thanh toán</span>
+                  <svg class="w-5 h-5 text-gray-400 group-hover:text-yellow-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+
+                <!-- Đổi mã quà tặng hoặc khuyến mại -->
+                <button class="w-full bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-gray-700 rounded-lg p-4 transition-all flex items-center justify-between group mb-3">
+                  <span class="text-white font-medium">Đổi mã quà tặng hoặc khuyến mại</span>
+                  <svg class="w-5 h-5 text-gray-400 group-hover:text-yellow-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+
+                <!-- Xem lịch sử thanh toán -->
+                <button class="w-full bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-gray-700 rounded-lg p-4 transition-all flex items-center justify-between group">
+                  <span class="text-white font-medium">Xem lịch sử thanh toán</span>
+                  <svg class="w-5 h-5 text-gray-400 group-hover:text-yellow-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Hủy tư cách thành viên -->
               <div class="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6">
-                <p class="text-gray-300">Thông tin chi tiết về gói thành viên của bạn.</p>
+                <button class="w-full text-center text-red-400 hover:text-red-300 font-medium transition-colors">
+                  Hủy tư cách thành viên
+                </button>
               </div>
             </div>
 
