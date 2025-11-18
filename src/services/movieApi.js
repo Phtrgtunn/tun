@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// Chuyển đổi giữa API trực tiếp và PHP backend
-const USE_PHP_BACKEND = false; // Dùng API trực tiếp từ phimapi.com
+// Chuyển đổi giữa API trực tiếp và Vercel proxy
+const USE_VERCEL_PROXY = true; // Dùng Vercel proxy để bypass CORS
 
-const BASE_URL = USE_PHP_BACKEND 
-  ? 'http://localhost/HTHREE_film/backend/api'
+const BASE_URL = USE_VERCEL_PROXY
+  ? '/api/proxy'
   : 'https://phimapi.com/v1/api';
 
 /**
