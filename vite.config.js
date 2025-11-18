@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import path from 'path';
 
 export default defineConfig({
+  base: '/', // Base path for Vercel
   plugins: [
     vue(), // Sử dụng plugin Vue
     // tailwindcss(), // Xóa hoặc comment dòng này
