@@ -41,7 +41,7 @@
               <!-- Content -->
               <div class="relative z-10">
                 <!-- Avatar & Poster -->
-                <div class="flex gap-3 mb-3">
+                <div class="flex gap-3 mb-3 justify-between">
                   <div class="relative flex-shrink-0">
                     <img :src="comment.avatar" :alt="comment.name" class="w-14 h-14 rounded-full border-3 border-gray-700/50 group-hover:border-yellow-400 transition-all shadow-lg" />
                     <div v-if="index === 0" class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg">∞</div>
@@ -144,19 +144,22 @@
             <span class="text-base">⚡</span>
             <h3 class="text-sm font-bold text-white uppercase">BÌNH LUẬN MỚI</h3>
           </div>
-          <div class="space-y-3">
-            <div v-for="comment in recentComments.slice(0, 3)" :key="comment.id" class="p-2 rounded-lg hover:bg-gray-800/50 transition cursor-pointer">
-              <div class="flex items-start gap-2 mb-1.5">
-                <img :src="comment.avatar" class="w-7 h-7 rounded-full" />
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <p class="text-white text-xs font-medium">{{ comment.name }}</p>
+          <div class="space-y-3 max-h-[400px] overflow-hidden">
+            <TransitionGroup name="comment-list">
+              <div v-for="comment in recentComments.slice(0, 5)" :key="comment.id" class="p-2 rounded-lg hover:bg-gray-800/50 transition cursor-pointer">
+                <div class="flex items-start gap-2 mb-1.5">
+                  <img :src="comment.avatar" class="w-7 h-7 rounded-full" />
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5">
+                      <p class="text-white text-xs font-medium">{{ comment.name }}</p>
+                      <span v-if="comment.time === 'vừa xong'" class="text-green-400 text-[10px] animate-pulse">●</span>
+                    </div>
+                    <p class="text-gray-400 text-[10px]">{{ comment.time }}</p>
                   </div>
-                  <p class="text-gray-400 text-[10px]">{{ comment.time }}</p>
                 </div>
+                <p class="text-gray-300 text-[11px] line-clamp-2 leading-relaxed">{{ comment.text }}</p>
               </div>
-              <p class="text-gray-300 text-[11px] line-clamp-2 leading-relaxed">{{ comment.text }}</p>
-            </div>
+            </TransitionGroup>
           </div>
         </div>
       </div>
@@ -244,6 +247,64 @@ const recentComments = ref([
   { id: 2, name: 'Margaret Qualley', avatar: 'https://ui-avatars.com/api/?name=Margaret&background=ef4444&color=fff', time: '2 phút trước', text: 'Tuyệt vời! Diễn xuất quá đỉnh' },
   { id: 3, name: 'Tsukii', avatar: 'https://ui-avatars.com/api/?name=Tsukii&background=3b82f6&color=fff', time: '5 phút trước', text: 'Cảm ơn đã chia sẻ!' }
 ]);
+
+// Danh sách bình luận mẫu để auto-load (50+ mẫu)
+const sampleComments = [
+  { name: 'Minh Anh', text: 'Phim hay quá! Tôi đã xem 3 lần rồi 😍' },
+  { name: 'Tuấn Kiệt', text: 'CGI đỉnh cao, xứng đáng 5 sao ⭐⭐⭐⭐⭐' },
+  { name: 'Linh Chi', text: 'Cảm động quá, tôi đã khóc khi xem 😢' },
+  { name: 'Hoàng Long', text: 'Diễn viên diễn xuất rất tự nhiên 👏' },
+  { name: 'Phương Anh', text: 'Cốt truyện hấp dẫn từ đầu đến cuối!' },
+  { name: 'Đức Anh', text: 'Nhạc phim hay lắm, nghe mãi không chán 🎵' },
+  { name: 'Mai Ly', text: 'Phim này đáng xem, recommend mọi người!' },
+  { name: 'Quang Huy', text: 'Đạo diễn tài năng thật! Mỗi cảnh đều ý nghĩa' },
+  { name: 'Thảo Nguyên', text: 'Tuyệt vời! Không thể bỏ lỡ bộ phim này' },
+  { name: 'Văn Toàn', text: 'Phim hay nhưng hơi dài, nên chia làm 2 phần xem' },
+  { name: 'Bảo Trâm', text: 'Cảnh quay đẹp mắt, màu sắc rực rỡ 🌈' },
+  { name: 'Hải Nam', text: 'Nội dung sâu sắc, đáng suy ngẫm 🤔' },
+  { name: 'Khánh Linh', text: 'Phim này làm tôi nhớ về tuổi thơ...' },
+  { name: 'Duy Khánh', text: 'Xem xong muốn xem lại ngay! 🔄' },
+  { name: 'Thu Hà', text: 'Diễn viên phụ cũng diễn rất hay!' },
+  { name: 'Minh Tuấn', text: 'Phim Việt ngày càng chất lượng 🇻🇳' },
+  { name: 'Ngọc Anh', text: 'Cảm ơn đã chia sẻ phim hay! ❤️' },
+  { name: 'Trung Hiếu', text: 'Phim này đáng giá từng phút xem!' },
+  { name: 'Lan Hương', text: 'Tôi đã giới thiệu cho bạn bè xem rồi 👍' },
+  { name: 'Quốc Bảo', text: 'Phim hay, nhưng cần phụ đề tốt hơn' },
+  { name: 'Anh Tuấn', text: 'Xem lúc 2h sáng vẫn không buồn ngủ! 😱' },
+  { name: 'Hương Giang', text: 'Phim này viral trên TikTok rồi 🔥' },
+  { name: 'Bảo Ngọc', text: 'Mình đã khóc hết cả hộp khăn giấy 😭' },
+  { name: 'Thanh Tùng', text: 'Phim xuất sắc! Oscar phải trao giải cho phim này' },
+  { name: 'Kim Ngân', text: 'Nhạc nền quá đỉnh, ai biết tên bài không?' },
+  { name: 'Việt Anh', text: 'Phim này phải xem ở rạp mới đã!' },
+  { name: 'Thùy Linh', text: 'Cảnh cuối làm tôi sốc nặng 😲' },
+  { name: 'Đăng Khoa', text: 'Phim hay nhất năm nay luôn!' },
+  { name: 'Phương Thảo', text: 'Tôi đã mua vé xem 2 lần rồi 🎬' },
+  { name: 'Hữu Nghĩa', text: 'Diễn viên chính quá đẹp trai! 😍' },
+  { name: 'Thanh Hà', text: 'Phim này đáng để chờ đợi!' },
+  { name: 'Minh Quân', text: 'Xem xong muốn đi du lịch ngay! ✈️' },
+  { name: 'Tú Anh', text: 'Phim này làm tôi suy nghĩ nhiều về cuộc sống' },
+  { name: 'Hoài Nam', text: 'Cảnh hành động mãn nhãn quá! 💥' },
+  { name: 'Bích Ngọc', text: 'Tôi đã recommend cho cả công ty xem rồi' },
+  { name: 'Quang Minh', text: 'Phim này xứng đáng trending #1! 📈' },
+  { name: 'Hạnh Nhân', text: 'Xem đi xem lại vẫn thấy hay!' },
+  { name: 'Tuấn Vũ', text: 'Phim này phải vào top 10 năm!' },
+  { name: 'Ngọc Trinh', text: 'Cảm xúc lên xuống như tàu lượn! 🎢' },
+  { name: 'Đức Thịnh', text: 'Phim này làm tôi cười và khóc!' },
+  { name: 'Mai Phương', text: 'Đạo diễn thiên tài! Respect! 🙏' },
+  { name: 'Hồng Nhung', text: 'Phim này sẽ là huyền thoại!' },
+  { name: 'Trọng Đại', text: 'Xem xong tôi đã trở thành fan cứng!' },
+  { name: 'Yến Nhi', text: 'Phim này phải có phần 2 thôi! 🙏' },
+  { name: 'Công Phượng', text: 'Tôi đã xem trailer 10 lần rồi!' },
+  { name: 'Thảo My', text: 'Phim này đáng để đợi cả năm!' },
+  { name: 'Xuân Trường', text: 'Cảnh chiến đấu quá hoành tráng! ⚔️' },
+  { name: 'Diệu Hương', text: 'Tôi sẽ mua đĩa Bluray về sưu tầm!' },
+  { name: 'Minh Hằng', text: 'Phim này làm tôi tin vào tình yêu! 💕' },
+  { name: 'Tuấn Hưng', text: 'Âm thanh Dolby Atmos quá đỉnh! 🔊' }
+];
+
+const colors = ['f59e0b', 'ef4444', '3b82f6', '10b981', 'ec4899', '8b5cf6', '14b8a6', 'f97316'];
+let commentIdCounter = 4;
+let autoLoadInterval = null;
 
 const scrollTopLeft = () => topScrollRef.value?.scrollBy({ left: -280, behavior: 'smooth' });
 const scrollTopRight = () => topScrollRef.value?.scrollBy({ left: 280, behavior: 'smooth' });
@@ -378,9 +439,72 @@ const loadCommunityData = async () => {
   }
 };
 
+// Hàm thêm bình luận mới tự động
+const addAutoComment = () => {
+  const randomComment = sampleComments[Math.floor(Math.random() * sampleComments.length)];
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  
+  const newComment = {
+    id: commentIdCounter++,
+    name: randomComment.name,
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(randomComment.name)}&background=${randomColor}&color=fff`,
+    time: 'vừa xong',
+    text: randomComment.text
+  };
+  
+  // Thêm vào đầu danh sách
+  recentComments.value.unshift(newComment);
+  
+  // Giữ tối đa 10 bình luận
+  if (recentComments.value.length > 10) {
+    recentComments.value.pop();
+  }
+  
+  // Cập nhật thời gian của các bình luận cũ
+  recentComments.value.forEach((comment, index) => {
+    if (index === 0) {
+      comment.time = 'vừa xong';
+    } else if (index === 1) {
+      comment.time = '1 phút trước';
+    } else if (index === 2) {
+      comment.time = '2 phút trước';
+    } else {
+      comment.time = `${index + 1} phút trước`;
+    }
+  });
+};
+
+// Bắt đầu auto-load khi component mount
+const startAutoLoad = () => {
+  // Load bình luận mới mỗi 2-4 giây (random) - nhanh hơn
+  const loadComment = () => {
+    addAutoComment();
+    const randomDelay = Math.floor(Math.random() * 2000) + 2000; // 2-4 giây
+    autoLoadInterval = setTimeout(loadComment, randomDelay);
+  };
+  
+  // Bắt đầu ngay sau 2 giây
+  autoLoadInterval = setTimeout(loadComment, 2000);
+};
+
+// Dừng auto-load khi component unmount
+const stopAutoLoad = () => {
+  if (autoLoadInterval) {
+    clearTimeout(autoLoadInterval);
+    autoLoadInterval = null;
+  }
+};
+
 onMounted(() => {
   loadCommunityData();
   fetchMoviesFromAPI();
+  startAutoLoad();
+});
+
+// Cleanup khi component bị destroy
+import { onUnmounted } from 'vue';
+onUnmounted(() => {
+  stopAutoLoad();
 });
 </script>
 
@@ -388,6 +512,41 @@ onMounted(() => {
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Comment list animations */
+.comment-list-enter-active {
+  animation: comment-slide-in 0.5s ease-out;
+}
+
+.comment-list-leave-active {
+  animation: comment-slide-out 0.3s ease-in;
+}
+
+.comment-list-move {
+  transition: all 0.5s ease;
+}
+
+@keyframes comment-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes comment-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
 
 /* Modal animations */
 .modal-enter-active {
