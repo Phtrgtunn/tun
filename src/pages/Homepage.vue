@@ -427,25 +427,34 @@ onMounted(async () => {
       axios.get('https://phimapi.com/v1/api/quoc-gia/nhat-ban?page=1&limit=25'),
       axios.get('https://phimapi.com/v1/api/tim-kiem?keyword=hoc vien sieu anh hung'),
     ]);
+    
+    console.log('✅ API calls completed');
 
-    // Thêm "Học viện siêu anh hùng" làm phim ĐẦU TIÊN
-    const myHeroAcademiaList = resMyHeroAcademia.data.data?.items || [];
-    if (myHeroAcademiaList.length > 0) {
-      const myHeroMovie = myHeroAcademiaList[0];
-      try {
-        const detailRes = await axios.get(`https://phimapi.com/phim/${myHeroMovie.slug}`);
-        if (detailRes.data?.movie) {
-          featuredMovies.value.push({
-            ...myHeroMovie,
-            content: detailRes.data.movie.content || myHeroMovie.content,
-            trailer_url: detailRes.data.movie.trailer_url
-          });
-        } else {
+    // Thêm "Học viện siêu anh hùng" làm phim ĐẦU TIÊN (nếu tìm được)
+    try {
+      const myHeroAcademiaList = resMyHeroAcademia?.data?.data?.items || [];
+      console.log('🦸 My Hero Academia search results:', myHeroAcademiaList.length);
+      
+      if (myHeroAcademiaList.length > 0) {
+        const myHeroMovie = myHeroAcademiaList[0];
+        try {
+          const detailRes = await axios.get(`https://phimapi.com/phim/${myHeroMovie.slug}`);
+          if (detailRes.data?.movie) {
+            featuredMovies.value.push({
+              ...myHeroMovie,
+              content: detailRes.data.movie.content || myHeroMovie.content,
+              trailer_url: detailRes.data.movie.trailer_url
+            });
+          } else {
+            featuredMovies.value.push(myHeroMovie);
+          }
+        } catch (err) {
+          console.log('⚠️ Could not fetch My Hero detail, using basic info');
           featuredMovies.value.push(myHeroMovie);
         }
-      } catch (err) {
-        featuredMovies.value.push(myHeroMovie);
       }
+    } catch (err) {
+      console.log('⚠️ My Hero Academia search failed, skipping');
     }
     
     // Lấy 2 phim featured tiếp theo

@@ -15,8 +15,8 @@
         <div 
           v-for="(movie, index) in movies" 
           :key="movie.slug"
-          class="absolute inset-0 transition-opacity duration-700"
-          :class="currentIndex === index ? 'opacity-100 z-10' : 'opacity-0 z-0'"
+          class="absolute inset-0 transition-all duration-1000 ease-in-out"
+          :class="currentIndex === index ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0'"
         >
           <!-- Background Image -->
           <img 
@@ -89,18 +89,18 @@
       <!-- Navigation Arrows -->
       <button 
         @click="prevSlide"
-        class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/50 hover:bg-black/80 rounded-full flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100"
+        class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/50 hover:bg-yellow-400 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover/carousel:opacity-100 hover:scale-110"
       >
-        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 text-white hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
       </button>
       
       <button 
         @click="nextSlide"
-        class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/50 hover:bg-black/80 rounded-full flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100"
+        class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/50 hover:bg-yellow-400 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover/carousel:opacity-100 hover:scale-110"
       >
-        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 text-white hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
         </svg>
       </button>
@@ -111,10 +111,10 @@
           v-for="(movie, index) in movies"
           :key="`dot-${movie.slug}`"
           @click="goToSlide(index)"
-          class="transition-all rounded-full"
+          class="transition-all duration-500 rounded-full"
           :class="currentIndex === index 
             ? 'w-8 h-2 bg-yellow-400' 
-            : 'w-2 h-2 bg-white/50 hover:bg-white/80'"
+            : 'w-2 h-2 bg-white/50 hover:bg-white/80 hover:scale-125'"
         ></button>
       </div>
     </div>
