@@ -35,46 +35,28 @@ export const getMovieList = async (params = {}) => {
   } = params;
 
   try {
-    if (USE_PHP_BACKEND) {
-      // Gọi PHP backend
-      const queryParams = new URLSearchParams({
-        type: type_list,
-        page: page.toString(),
-        sort_field,
-        sort_type,
-        limit: limit.toString()
-      });
+    // Build query params
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      sort_field,
+      sort_type,
+      limit: limit.toString()
+    });
 
-      if (sort_lang) queryParams.append('sort_lang', sort_lang);
-      if (category) queryParams.append('category', category);
-      if (country) queryParams.append('country', country);
-      if (year) queryParams.append('year', year.toString());
+    if (sort_lang) queryParams.append('sort_lang', sort_lang);
+    if (category) queryParams.append('category', category);
+    if (country) queryParams.append('country', country);
+    if (year) queryParams.append('year', year.toString());
 
-      const url = `${BASE_URL}/movies.php?${queryParams.toString()}`;
-      console.log('📡 Fetching movies (PHP):', url);
+    const apiPath = USE_VERCEL_PROXY 
+      ? `?path=danh-sach&path=${type_list}&${queryParams.toString()}`
+      : `/danh-sach/${type_list}?${queryParams.toString()}`;
+    
+    const url = `${BASE_URL}${apiPath}`;
+    console.log('📡 Fetching movies:', url);
 
-      const response = await axios.get(url);
-      return response.data;
-    } else {
-      // Gọi API trực tiếp
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        sort_field,
-        sort_type,
-        limit: limit.toString()
-      });
-
-      if (sort_lang) queryParams.append('sort_lang', sort_lang);
-      if (category) queryParams.append('category', category);
-      if (country) queryParams.append('country', country);
-      if (year) queryParams.append('year', year.toString());
-
-      const url = `${BASE_URL}/danh-sach/${type_list}?${queryParams.toString()}`;
-      console.log('📡 Fetching movies:', url);
-
-      const response = await axios.get(url);
-      return response.data;
-    }
+    const response = await axios.get(url);
+    return response.data;
   } catch (error) {
     console.error('❌ Error fetching movies:', error);
     throw error;
@@ -166,10 +148,11 @@ export const getMoviesByYear = (year, params = {}) => {
  */
 export const getPhimMoiCapNhat = async (page = 1) => {
   try {
-    const url = USE_PHP_BACKEND
-      ? `${BASE_URL}/movies.php?type=phim-moi-cap-nhat&page=${page}`
-      : `https://phimapi.com/danh-sach/phim-moi-cap-nhat?page=${page}`;
+    const apiPath = USE_VERCEL_PROXY
+      ? `?path=danh-sach&path=phim-moi-cap-nhat&page=${page}`
+      : `/danh-sach/phim-moi-cap-nhat?page=${page}`;
     
+    const url = `${BASE_URL}${apiPath}`;
     console.log('📡 Fetching phim mới cập nhật:', url);
     
     const response = await axios.get(url);
@@ -187,10 +170,11 @@ export const getPhimMoiCapNhat = async (page = 1) => {
  */
 export const getMovieDetail = async (slug) => {
   try {
-    const url = USE_PHP_BACKEND
-      ? `${BASE_URL}/detail.php?slug=${slug}`
-      : `https://phimapi.com/phim/${slug}`;
+    const apiPath = USE_VERCEL_PROXY
+      ? `?path=phim&path=${slug}`
+      : `/phim/${slug}`;
     
+    const url = `${BASE_URL}${apiPath}`;
     console.log('📡 Fetching movie detail:', url);
     
     const response = await axios.get(url);
@@ -416,10 +400,11 @@ export const searchMovies = async (keyword, params = {}) => {
     if (country) queryParams.append('country', country);
     if (year) queryParams.append('year', year.toString());
 
-    const url = USE_PHP_BACKEND
-      ? `${BASE_URL}/search.php?${queryParams.toString()}`
-      : `https://phimapi.com/v1/api/tim-kiem?${queryParams.toString()}`;
+    const apiPath = USE_VERCEL_PROXY
+      ? `?path=v1&path=api&path=tim-kiem&${queryParams.toString()}`
+      : `/v1/api/tim-kiem?${queryParams.toString()}`;
     
+    const url = `${BASE_URL}${apiPath}`;
     console.log('🔍 Searching movies:', url);
 
     const response = await axios.get(url);
