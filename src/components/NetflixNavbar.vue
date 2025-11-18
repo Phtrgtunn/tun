@@ -325,9 +325,9 @@
         <!-- Mobile Menu Toggle -->
         <button 
           @click="mobileMenuOpen = !mobileMenuOpen"
-          class="md:hidden"
+          class="lg:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
@@ -337,25 +337,86 @@
     <!-- Mobile Menu -->
     <div 
       v-if="mobileMenuOpen"
-      class="md:hidden bg-black/95 px-4 py-4"
+      class="lg:hidden bg-gray-900/98 backdrop-blur-lg border-t border-gray-800 shadow-2xl"
     >
-      <ul class="space-y-4">
-        <li>
-          <router-link to="/home" @click="mobileMenuOpen = false">
+      <div class="px-4 py-6 space-y-2">
+        <router-link 
+          to="/home" 
+          @click="mobileMenuOpen = false"
+          class="block px-4 py-3 text-white hover:bg-gray-800 hover:text-yellow-400 rounded-lg transition-all font-medium"
+        >
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+            </svg>
             Trang chủ
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/list/phim-bo/page/1" @click="mobileMenuOpen = false">
-            Phim bộ
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/list/phim-le/page/1" @click="mobileMenuOpen = false">
-            Phim lẻ
-          </router-link>
-        </li>
-      </ul>
+          </div>
+        </router-link>
+        
+        <router-link 
+          to="/list/phim-le/page/1" 
+          @click="mobileMenuOpen = false"
+          class="block px-4 py-3 text-white hover:bg-gray-800 hover:text-yellow-400 rounded-lg transition-all font-medium"
+        >
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+            </svg>
+            Phim Lẻ
+          </div>
+        </router-link>
+        
+        <router-link 
+          to="/list/phim-bo/page/1" 
+          @click="mobileMenuOpen = false"
+          class="block px-4 py-3 text-white hover:bg-gray-800 hover:text-yellow-400 rounded-lg transition-all font-medium"
+        >
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+            </svg>
+            Phim Bộ
+          </div>
+        </router-link>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-800 my-4"></div>
+
+        <!-- User Section on Mobile -->
+        <div v-if="!user" class="px-4 py-3">
+          <button 
+            @click="showAuthModal = true; mobileMenuOpen = false"
+            class="w-full bg-yellow-400 text-black px-4 py-3 rounded-lg font-bold hover:bg-yellow-500 transition-all flex items-center justify-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+            </svg>
+            Đăng nhập
+          </button>
+        </div>
+        <div v-else class="px-4 py-3 space-y-2">
+          <div class="flex items-center gap-3 mb-3">
+            <img 
+              :src="user?.avatar || user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || user?.displayName || user?.username || 'User')}&background=f59e0b&color=000`"
+              class="w-12 h-12 rounded-full border-2 border-yellow-400"
+              :alt="user?.full_name || user?.displayName || user?.username || 'User'"
+            />
+            <div>
+              <p class="text-white font-bold">{{ user?.full_name || user?.displayName || user?.username }}</p>
+              <p class="text-gray-400 text-sm">{{ user?.email }}</p>
+            </div>
+          </div>
+          <button 
+            @click="handleLogout(); mobileMenuOpen = false"
+            class="w-full bg-gray-800 text-white px-4 py-3 rounded-lg font-medium hover:bg-gray-700 transition-all flex items-center justify-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            Đăng xuất
+          </button>
+        </div>
+      </div>
     </div>
   </nav>
 
